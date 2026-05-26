@@ -19,7 +19,7 @@ nav img{height:42px}
 .nav-links a:hover{color:#3CB70A}
 .nav-cta{background:#3CB70A!important;color:#0a1628!important;border-radius:4px!important}
 .nav-cta:hover{background:#4dd40d!important}
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:1000}
 .hamburger span{width:22px;height:2px;background:#fff;display:block}
 .mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;background:#0d1e36;border-bottom:2px solid #3CB70A;padding:16px;z-index:998}
 .mobile-menu.open{display:block}
@@ -146,8 +146,8 @@ footer{background:#060e1a;border-top:2px solid #3CB70A;padding:40px 24px 24px}
 
 /* ── MOBILE ── */
 @media(max-width:900px){
-  .nav-links{display:none}
-  .hamburger{display:flex}
+  .nav-links{display:none!important}
+  .hamburger{display:flex!important}
   .hero-inner{grid-template-columns:1fr}
   .hero-card{display:none}
   .services-grid{grid-template-columns:1fr}
