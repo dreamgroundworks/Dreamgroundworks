@@ -173,7 +173,6 @@ footer{background:#060e1a;border-top:2px solid #3CB70A;padding:40px 24px 24px}
     <ul class="nav-links">
       <li><a href="#services">Services</a></li>
       <li><a href="#how">How It Works</a></li>
-      <li><a href="#reviews">Reviews</a></li>
       <li><a href="#contact" class="nav-cta">Get a Free Quote</a></li>
     </ul>
     <button class="hamburger" id="ham" aria-label="Menu">
@@ -184,7 +183,6 @@ footer{background:#060e1a;border-top:2px solid #3CB70A;padding:40px 24px 24px}
 <div class="mobile-menu" id="mobileMenu">
   <a href="#services" onclick="closeMenu()">Services</a>
   <a href="#how" onclick="closeMenu()">How It Works</a>
-  <a href="#reviews" onclick="closeMenu()">Reviews</a>
   <a href="#contact" onclick="closeMenu()">Get a Free Quote</a>
 </div>
 
@@ -224,7 +222,7 @@ footer{background:#060e1a;border-top:2px solid #3CB70A;padding:40px 24px 24px}
     <div class="trust-item">✓ Fully Insured</div>
     <div class="trust-item">✓ Owner Operated</div>
     <div class="trust-item">✓ Free Written Quotes</div>
-    <div class="trust-item">✓ All Cards &amp; Cash Accepted</div>
+    <div class="trust-item">✓ Bank Transfer &amp; Cash Accepted</div>
     <div class="trust-item">✓ Respond Within 2 Hours</div>
   </div>
 </div>
@@ -294,49 +292,12 @@ footer{background:#060e1a;border-top:2px solid #3CB70A;padding:40px 24px 24px}
       <div class="step">
         <div class="step-num">3</div>
         <h4>Written Quote</h4>
-        <p>You get a clear itemised written quote the same day. No hidden costs, no surprises.</p>
+        <p>You get a quote within 3 working days of your site visit. No hidden costs, no surprises.</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <h4>Job Done</h4>
         <p>We show up on time, do the job right, and leave your site clean and tidy.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="divider"></div>
-
-<!-- REVIEWS -->
-<div class="section services-bg" id="reviews">
-  <div class="section-inner">
-    <div class="section-label">Customer Reviews</div>
-    <h2 class="section-title">What People Say</h2>
-    <p class="section-sub">Real reviews from customers across the West of Scotland.</p>
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Absolutely delighted with the work. Turned up exactly when they said, completed the driveway dig in a day and left the place spotless. Would recommend to anyone."</p>
-        <div class="review-author">
-          <div class="review-avatar">JM</div>
-          <div><div class="review-name">James M.</div><div class="review-loc">Paisley</div></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Professional from start to finish. Great communication and the quote was exactly what we paid. Used Dream Groundworks for our extension foundations — brilliant."</p>
-        <div class="review-author">
-          <div class="review-avatar">SR</div>
-          <div><div class="review-name">Sarah R.</div><div class="review-loc">Glasgow</div></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Efficient, tidy and great to deal with on site. Already booked them again for our next project. Top quality — couldn't recommend more highly."</p>
-        <div class="review-author">
-          <div class="review-avatar">DK</div>
-          <div><div class="review-name">David K.</div><div class="review-loc">Ayrshire</div></div>
-        </div>
       </div>
     </div>
   </div>
@@ -406,17 +367,25 @@ footer{background:#060e1a;border-top:2px solid #3CB70A;padding:40px 24px 24px}
             <label>Email Address</label>
             <input type="email" name="email" placeholder="your@email.com">
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Job Address *</label>
+              <input type="text" name="address" placeholder="123 Main Street" required>
+            </div>
+            <div class="form-group">
+              <label>Postcode *</label>
+              <input type="text" name="postcode" placeholder="e.g. PA1 1AA" required>
+            </div>
+          </div>
           <div class="form-group">
             <label>Type of Job *</label>
             <select name="job_type" required>
               <option value="">Select a service...</option>
               <option>Driveway Excavation</option>
               <option>Foundation Digging</option>
-              <option>Landscaping Groundworks</option>
+              <option>Landscaping Preparation</option>
               <option>Digger &amp; Operator Hire</option>
-              <option>Garden Clearance</option>
-              <option>Spoil &amp; Waste Removal</option>
-              <option>Other / Not Sure</option>
+              <option>Ground Levelling</option>
             </select>
           </div>
           <div class="form-group">
