@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Dream Groundworks</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Barlow',sans-serif;background:#0a1628;color:#fff;min-height:100vh;padding-bottom:70px}
+/* HEADER */
+.hdr{background:#0a1628;border-bottom:2px solid #3CB70A;padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.2rem}.hdr-logo span{color:#3CB70A}
+.hdr-date{font-size:0.68rem;color:#8892a4}
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#060e1a;border-top:2px solid #3CB70A;display:grid;grid-template-columns:repeat(6,1fr)}
+.bni{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 2px;cursor:pointer;background:none;border:none;color:#8892a4;transition:color 0.2s}
+.bni.active{color:#3CB70A}
+.bni-icon{font-size:1.2rem;line-height:1}
+.bni-label{font-size:0.5rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin-top:2px}
+/* PAGES */
+.pg{display:none;padding:14px 14px 20px;max-width:640px;margin:0 auto}
+.pg.active{display:block}
+/* COMPONENTS */
+.sec{background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;margin-bottom:10px}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;font-weight:900;text-transform:uppercase;color:#3CB70A;letter-spacing:0.1em;margin-bottom:10px}
+.stabs{display:flex;overflow-x:auto;scrollbar-width:none;background:#0d1e36;border-radius:8px;padding:3px;gap:3px;margin-bottom:12px}
+.stabs::-webkit-scrollbar{display:none}
+.stab{padding:7px 13px;font-size:0.7rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8892a4;cursor:pointer;white-space:nowrap;border-radius:5px;flex-shrink:0}
+.stab.active{background:#3CB70A;color:#0a1628}
+.fg{margin-bottom:10px}
+.fg label{display:block;font-size:0.63rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#8892a4;margin-bottom:4px}
+.fg input,.fg select,.fg textarea{width:100%;background:#0d1e36;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px 11px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:0.88rem;outline:none;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#3CB70A}
+.fg select option{background:#0d1e36}
+.fg textarea{resize:vertical;min-height:65px;line-height:1.5}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn-g{width:100%;background:#3CB70A;color:#0a1628;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1rem;letter-spacing:0.08em;text-transform:uppercase;border:none;padding:13px;border-radius:7px;cursor:pointer;margin-bottom:8px}
+.btn-g:active{background:#2a8a06}
+.btn-s{width:100%;background:rgba(255,255,255,0.06);color:#ccd6f6;font-family:'Barlow',sans-serif;font-weight:600;font-size:0.83rem;border:1px solid rgba(255,255,255,0.1);padding:11px;border-radius:7px;cursor:pointer;margin-bottom:8px}
+.btn-add{width:100%;background:rgba(60,183,10,0.07);border:1px dashed rgba(60,183,10,0.25);color:#3CB70A;font-family:'Barlow',sans-serif;font-weight:600;font-size:0.78rem;padding:9px;border-radius:6px;cursor:pointer;margin-top:6px}
+.back-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:#3CB70A;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.85rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;padding:0 0 10px 0}
+.stepper{display:flex;align-items:center;background:#0d1e36;border:1px solid rgba(255,255,255,0.1);border-radius:6px;overflow:hidden}
+.step-btn{background:none;border:none;color:#3CB70A;font-size:1.3rem;padding:7px 14px;cursor:pointer;font-family:'Barlow',sans-serif}
+.step-val{flex:1;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:900}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.chip{padding:5px 10px;border-radius:13px;font-size:0.7rem;font-weight:600;border:1px solid rgba(255,255,255,0.12);color:#8892a4;cursor:pointer;background:none;transition:all 0.15s}
+.chip.on{background:rgba(60,183,10,0.15);border-color:#3CB70A;color:#3CB70A}
+.slider-row{display:flex;align-items:center;gap:10px}
+.slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:#0d1e36;outline:none}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#3CB70A;cursor:pointer}
+.sval{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:900;color:#3CB70A;min-width:36px;text-align:right}
+/* CARDS */
+.card{background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:13px;margin-bottom:8px}
+.card-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.card-name{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:900;text-transform:uppercase}
+.card-meta{font-size:0.68rem;color:#3CB70A;margin-top:2px}
+.tag{padding:3px 8px;border-radius:10px;font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;flex-shrink:0;margin-left:6px}
+.tq{background:rgba(255,165,0,0.15);color:#ffa500;border:1px solid rgba(255,165,0,0.25)}
+.tc{background:rgba(60,183,10,0.15);color:#3CB70A;border:1px solid rgba(60,183,10,0.25)}
+.tp{background:rgba(0,150,255,0.15);color:#0096ff;border:1px solid rgba(0,150,255,0.25)}
+.td{background:rgba(255,255,255,0.08);color:#8892a4;border:1px solid rgba(255,255,255,0.12)}
+.tx{background:rgba(255,68,68,0.12);color:#ff4444;border:1px solid rgba(255,68,68,0.2)}
+.to{background:rgba(255,165,0,0.1);color:#ffa500;border:1px solid rgba(255,165,0,0.2)}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
+.cdet{background:#0d1e36;border-radius:5px;padding:6px 8px}
+.cdl{font-size:0.58rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1px}
+.cdv{font-size:0.82rem;font-weight:600;color:#ccd6f6}
+.cdv.g{color:#3CB70A}.cdv.o{color:#ffa500}.cdv.r{color:#ff4444}
+.pbar{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px}
+.ps{background:#0d1e36;border-radius:4px;padding:5px;text-align:center;border:1px solid rgba(255,255,255,0.05)}
+.ps.paid{background:rgba(60,183,10,0.1);border-color:rgba(60,183,10,0.25)}
+.psl{font-size:0.56rem;color:#8892a4;text-transform:uppercase}
+.psv{font-size:0.75rem;font-weight:700;color:#ccd6f6}
+.ps.paid .psv{color:#3CB70A}
+.card-acts{display:flex;gap:5px;flex-wrap:wrap}
+.cbtn{padding:6px 10px;border-radius:4px;font-size:0.63rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;border:none;cursor:pointer;font-family:'Barlow',sans-serif}
+.cb-g{background:#3CB70A;color:#0a1628}
+.cb-w{background:#25D366;color:#fff}
+.cb-e{background:rgba(255,255,255,0.07);color:#ccd6f6;border:1px solid rgba(255,255,255,0.1)}
+.cb-d{background:rgba(255,68,68,0.08);color:#ff4444;border:1px solid rgba(255,68,68,0.15)}
+.cb-s{background:rgba(60,183,10,0.1);color:#3CB70A;border:1px solid rgba(60,183,10,0.2)}
+/* RESULT */
+.result-box{background:#112240;border:2px solid #3CB70A;border-radius:12px;padding:16px;text-align:center;margin-bottom:12px}
+.rb-label{font-size:0.68rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px}
+.rb-val{font-family:'Barlow Condensed',sans-serif;font-size:3.5rem;font-weight:900;color:#3CB70A;line-height:1}
+.rb-sub{font-size:0.75rem;color:#8892a4;margin-top:4px}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:10px}
+.ri{background:#0d1e36;border-radius:6px;padding:8px 5px;text-align:center}
+.ril{font-size:0.56rem;color:#8892a4;text-transform:uppercase;margin-bottom:2px}
+.riv{font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:900}
+.rv-g{color:#3CB70A}.rv-o{color:#ffa500}.rv-r{color:#ff4444}.rv-w{color:#ccd6f6}
+.pay3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:10px}
+.p3{background:#0d1e36;border-radius:6px;padding:8px 5px;text-align:center;border:1px solid rgba(60,183,10,0.2)}
+.p3l{font-size:0.56rem;color:#3CB70A;text-transform:uppercase;font-weight:700;margin-bottom:2px}
+.p3v{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900}
+.p3s{font-size:0.56rem;color:#8892a4;margin-top:1px}
+/* MONEY */
+.money-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.mg{background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px}
+.mgl{font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px}
+.mgv{font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:900;color:#3CB70A;line-height:1}
+.mgs{font-size:0.66rem;color:#8892a4;margin-top:2px}
+.mgv.o{color:#ffa500}
+.tax-box{background:rgba(255,165,0,0.07);border:1px solid rgba(255,165,0,0.2);border-radius:10px;padding:14px;margin-bottom:10px}
+.tax-title{font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;font-weight:900;text-transform:uppercase;color:#ffa500;letter-spacing:0.1em;margin-bottom:5px}
+.tax-amt{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;color:#ffa500}
+.tax-sub{font-size:0.7rem;color:#8892a4;margin-top:3px}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.mrow:last-child{border-bottom:none}
+.ml{font-size:0.82rem;color:#ccd6f6}
+.mv{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:900}
+.mv-g{color:#3CB70A}.mv-o{color:#ffa500}.mv-r{color:#ff4444}.mv-w{color:#ccd6f6}
+.entry-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.e-desc{flex:1;background:#0d1e36;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:9px 10px;border-radius:5px;font-family:'Barlow',sans-serif;font-size:0.84rem;outline:none}
+.e-desc:focus{border-color:#3CB70A}
+.e-amt{width:80px;background:#0d1e36;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:9px 8px;border-radius:5px;font-family:'Barlow',sans-serif;font-size:0.84rem;outline:none;text-align:right}
+.e-amt:focus{border-color:#3CB70A}
+.e-del{background:none;border:none;color:#ff4444;font-size:1.1rem;cursor:pointer;padding:2px 5px;flex-shrink:0}
+/* CHECKLIST */
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;background:#0d1e36;border-radius:7px;cursor:pointer;border:1px solid transparent;margin-bottom:5px}
+.cl-item.done{background:rgba(60,183,10,0.05);border-color:rgba(60,183,10,0.18)}
+.cl-box{width:18px;height:18px;border:2px solid rgba(255,255,255,0.2);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.cl-item.done .cl-box{background:#3CB70A;border-color:#3CB70A}
+.cl-tick{color:#0a1628;font-size:0.65rem;font-weight:900;display:none}
+.cl-item.done .cl-tick{display:block}
+.cl-text h4{font-size:0.82rem;font-weight:600;color:#ccd6f6}
+.cl-item.done .cl-text h4{color:#8892a4;text-decoration:line-through}
+.cl-text p{font-size:0.68rem;color:#8892a4;margin-top:1px}
+/* INFO BOXES */
+.ibox{background:rgba(60,183,10,0.06);border:1px solid rgba(60,183,10,0.15);border-radius:7px;padding:9px 11px;font-size:0.75rem;color:#8892a4;line-height:1.5;margin-top:7px}
+.ibox strong{color:#3CB70A}
+.wbox{background:rgba(255,165,0,0.06);border:1px solid rgba(255,165,0,0.2);border-radius:7px;padding:9px 11px;font-size:0.75rem;color:#8892a4;line-height:1.5;margin-top:7px}
+.wbox strong{color:#ffa500}
+.dbox{background:rgba(255,68,68,0.06);border:1px solid rgba(255,68,68,0.2);border-radius:7px;padding:9px 11px;font-size:0.75rem;color:#8892a4;line-height:1.5;margin-top:7px}
+.dbox strong{color:#ff4444}
+/* MEASURE */
+.meas-area{background:#0d1e36;border-radius:8px;padding:11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.07)}
+.meas-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.meas-name{background:none;border:none;color:#3CB70A;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:900;text-transform:uppercase;outline:none;width:120px}
+.meas-del{background:none;border:none;color:#ff4444;font-size:1rem;cursor:pointer;padding:0}
+.meas-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.meas-input-wrap label{font-size:0.58rem;color:#8892a4;text-transform:uppercase;margin-bottom:3px;display:block}
+.meas-input{width:100%;background:#112240;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:8px;border-radius:5px;font-family:'Barlow',sans-serif;font-size:0.88rem;outline:none;text-align:center}
+.meas-input:focus{border-color:#3CB70A}
+.meas-result{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:rgba(60,183,10,0.05);border-radius:5px;padding:7px;text-align:center}
+.mr-label{font-size:0.56rem;color:#8892a4;text-transform:uppercase}
+.mr-val{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900;color:#3CB70A}
+.meas-total-box{background:#0d1e36;border-radius:8px;padding:11px;margin-top:6px;display:none}
+.mt-title{font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:900;text-transform:uppercase;color:#3CB70A;letter-spacing:0.08em;margin-bottom:7px}
+/* HASHTAG */
+.htag{background:#0d1e36;border:1px solid rgba(255,255,255,0.1);color:#ccd6f6;padding:5px 9px;border-radius:12px;font-size:0.7rem;cursor:pointer;margin:3px}
+.htag.on{background:rgba(60,183,10,0.15);border-color:#3CB70A;color:#3CB70A}
+.hgrp-label{font-size:0.63rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#8892a4;margin:10px 0 5px}
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:flex-end}
+.modal-ov.open{display:flex}
+.modal{background:#0d1e36;border-radius:16px 16px 0 0;padding:20px 16px;width:100%;max-height:90vh;overflow-y:auto;border-top:2px solid #3CB70A}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:900;text-transform:uppercase;margin-bottom:14px;color:#3CB70A}
+.modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.modal-ok{background:#3CB70A;color:#0a1628;font-weight:700;padding:12px;border:none;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:0.88rem;text-transform:uppercase}
+.modal-cn{background:rgba(255,255,255,0.07);color:#ccd6f6;font-weight:700;padding:12px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:0.88rem}
+/* HOME */
+.dash-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.ds{background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:13px}
+.ds-label{font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px}
+.ds-val{font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:900;color:#3CB70A;line-height:1}
+.ds-sub{font-size:0.66rem;color:#8892a4;margin-top:2px}
+.ds-val.o{color:#ffa500}
+.alert-card{background:#112240;border-left:3px solid #ff4444;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer}
+.alert-card.o{border-left-color:#ffa500}
+.alert-card.g{border-left-color:#3CB70A}
+.at{font-size:0.82rem;color:#ccd6f6;font-weight:600}
+.as{font-size:0.7rem;color:#8892a4;margin-top:2px}
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.qa{background:#112240;border:1px solid rgba(60,183,10,0.2);border-radius:10px;padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.qa:active{background:rgba(60,183,10,0.08)}
+.qa-icon{font-size:1.5rem;flex-shrink:0}
+.qa-text h4{font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:900;text-transform:uppercase}
+.qa-text p{font-size:0.65rem;color:#8892a4;margin-top:1px}
+.sec-label{font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;font-weight:900;text-transform:uppercase;color:#8892a4;letter-spacing:0.1em;margin-bottom:8px}
+/* WA FLOAT */
+.wa-float{position:fixed;bottom:76px;right:14px;z-index:99;background:#25D366;color:#fff;width:50px;height:50px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:1.3rem;text-decoration:none;box-shadow:0 4px 14px rgba(37,211,102,0.4)}
+.empty{text-align:center;padding:36px 20px;color:#8892a4}
+.empty-icon{font-size:2.4rem;margin-bottom:10px}
+.empty h3{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;color:#ccd6f6}
+.empty p{font-size:0.8rem;line-height:1.5}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <img src="data:image/png;base64,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ZeKVNQNOzkJLODHnIOYPWAc3QvuazMB6l0BYFutR29YyMDkvfK+dkUgjWeQ47vzzJsPytly6YBH4WiGCJUHaAuJEbKle6WySHet0+9p0ZoMGX9TFUnOWJieuqB230BIT073xVws5jwdBIEgqKTI9lOZcMb1PI0Au1vtnX4AFrKLsjVEB2JLOcUqpeDx+2223RSHNF1544dJLLzVSatt2+NH+/fv//d///Te/+U1jY6PZksPJj0Z3jFouWQ1SynDFGFu64kyby0WXBTOXn2r4s9au75cfUPJFIYTZmMovGovFygGVUBhKvmLbdrkiNZNQcmQ4zvBxRGfJfBqVrhJsOfp1A/v5vl9xg7Asq+QjpVT0HbOrVpHPioIaHW0YyTNX1FpXeYLGtK7AhaiwzyEia81AKF772cBAp8jFpT8o/T3+4E7t9ucAFABKIRiD6pijYPqAhFTo8QGApPA9P5lKtH5I9ts9SWFLEghSu+ilVf9u2bM5N7DeS7/iaIcBsLl53HErx487kxLzsvlJAy70HyzkfRdkAQQhB3VpSyP7URLHsNoiGj3NteMT++6TmS15KVFriBKiSvrWVI9ASCkLhcL73//+BQsWhEp17969l1xySUdHRyKR8DwvDMyY46WUnud1dHQYWQ0vN3v27Pr6eqWUEGL37t29vb0zZ8688MILp0yZ4rruqlWrXn75ZaMWzDOeP3/+ihUr5s+f39LSwsx9fX1r165dvXr1hg0bzPMOxVUIMX/+fANiWZbV09Oze/fu0HgDgHgicfxxxzEza7Zse9/+fQcPHgSAeDx+3HHHhYdt2bIln89Pnz79bW9727HHHhuPx7u7u3fs2PHkk08ODAyY1VwShjFY98qVK0866aT6+vpsNrtp06Znnnmmv79fDM+08n0/lUrNmzfPN92MLKtt397u7u5Q0xpDY+HCheaLvu9v2bJFax3FnxsaGlpbW33ftyyrt7d39+7doR52HKexsXHlypULFiyYNWtWKpXq7+/funXrunXrnn32WQNHR7fO+vr68FSDg4Pbtm0DgHe/+91z584VQvT39//0pz+tiPcW6aLoed6ihSdaluVrJYTwff+1114LdbJlWWedddapp546f/78RCKRTqc3bdq0du3adevW9fX1RQV7yCURVV4kpSAiApAAFoJEsAiEJaQtpbSGDpTFV8kJzDvhp9KS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" style="height:36px;width:auto;display:block" alt="Dream Groundworks">
+  <div class="hdr-date" id="hdrDate"></div>
+</div>
+
+<a href="https://wa.me/447472762523" target="_blank" class="wa-float" id="waFloat">💬</a>
+
+<!-- PAGES -->
+<div class="pg active" id="pg-home"></div>
+<div class="pg" id="pg-jobs"></div>
+<div class="pg" id="pg-quote"></div>
+<div class="pg" id="pg-money"></div>
+<div class="pg" id="pg-msg"></div>
+<div class="pg" id="pg-content"></div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="bni active" onclick="nav('home')" id="bni-home"><div class="bni-icon">🏠</div><div class="bni-label">Home</div></button>
+  <button class="bni" onclick="nav('jobs')" id="bni-jobs"><div class="bni-icon">🏗️</div><div class="bni-label">Jobs</div></button>
+  <button class="bni" onclick="nav('quote')" id="bni-quote"><div class="bni-icon">📐</div><div class="bni-label">Quote</div></button>
+  <button class="bni" onclick="nav('money')" id="bni-money"><div class="bni-icon">💰</div><div class="bni-label">Money</div></button>
+  <button class="bni" onclick="nav('msg')" id="bni-msg"><div class="bni-icon">💬</div><div class="bni-label">Messages</div></button>
+  <button class="bni" onclick="nav('content')" id="bni-content"><div class="bni-icon">📱</div><div class="bni-label">Content</div></button>
+</div>
+
+<!-- JOB MODAL -->
+<div class="modal-ov" id="jobModal">
+<div class="modal">
+  <div class="modal-title" id="jModalTitle">Add Job</div>
+  <div class="fg"><label>Customer Name *</label><input type="text" id="jName" placeholder="John Smith"></div>
+  <div class="fr">
+    <div class="fg"><label>Phone</label><input type="tel" id="jPhone" placeholder="07700 000000"></div>
+    <div class="fg"><label>Status</label><select id="jStatus">
+      <option value="quoted">Quoted</option><option value="confirmed">Confirmed</option>
+      <option value="inprogress">In Progress</option><option value="completed">Completed</option>
+      <option value="declined">Declined</option><option value="onhold">On Hold</option><option value="cancelled">Cancelled</option>
+    </select></div>
+  </div>
+  <div class="fg"><label>Job Type</label><select id="jType">
+    <option>Driveway Excavation</option><option>Foundation Digging</option>
+    <option>Landscaping Groundworks</option><option>Ground Levelling</option>
+    <option>Garden Clearance</option><option>Digger Hire</option><option>Other</option>
+  </select></div>
+  <div class="fg"><label>Location</label><input type="text" id="jLoc" placeholder="Paisley, PA1"></div>
+  <div class="fr">
+    <div class="fg"><label>Start Date</label><input type="date" id="jDate"></div>
+    <div class="fg"><label>Days</label><input type="number" id="jDays" placeholder="1"></div>
+  </div>
+  <div class="fg"><label>Quote (£)</label><input type="number" id="jQuote" placeholder="0"></div>
+  <div class="fr">
+    <div class="fg"><label>Deposit Paid (£)</label><input type="number" id="jDep" placeholder="0"></div>
+    <div class="fg"><label>Materials Paid (£)</label><input type="number" id="jMat" placeholder="0"></div>
+  </div>
+  <div class="fg"><label>Balance Paid (£)</label><input type="number" id="jBal" placeholder="0"></div>
+  <div class="fg"><label>Quote Sent Date</label><input type="date" id="jQSent"></div>
+  <div class="fg"><label>Notes</label><textarea id="jNotes" placeholder="Site details, access, anything to remember..."></textarea></div>
+  <div class="modal-btns">
+    <button class="modal-cn" onclick="closeModal('jobModal')">Cancel</button>
+    <button class="modal-ok" onclick="saveJob()">Save Job</button>
+  </div>
+</div>
+</div>
+
+<!-- SAVE QUOTE MODAL -->
+<div class="modal-ov" id="sqModal">
+<div class="modal">
+  <div class="modal-title">Save Quote</div>
+  <div class="fg"><label>Customer Name</label><input type="text" id="sqName" placeholder="John Smith"></div>
+  <div class="modal-btns">
+    <button class="modal-cn" onclick="closeModal('sqModal')">Cancel</button>
+    <button class="modal-ok" onclick="doSaveQuote()">Save</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════
+const TAX = 0.27;
+let jobs = JSON.parse(localStorage.getItem('dgj') || '[]');
+let weekData = JSON.parse(localStorage.getItem('dgw') || '{}');
+let savedQuotes = JSON.parse(localStorage.getItem('dgq') || '[]');
+let contentPosts = JSON.parse(localStorage.getItem('dgc') || '{}');
+let selHashtags = new Set(['#dreamgroundworks','#westofscotland','#excavation','#groundworks','#beforeandafter','#fyp']);
+let curPage = 'home', editJobId = null;
+let jobSubTab = 'all', moneySubTab = 'week', quoteSubTab = 'visit', msgSubTab = 'enquiry', contentSubTab = 'plan';
+let weekOffset = 0, contentWeekOffset = 0;
+// Quote calc state
+let qDays = 1, qHireDays = 5, qSkips = 0, qRisk = 0, qResult = null;
+// Visit state
+let measurements = [{id:'m0', name:'Area 1', l:'', w:'', d:'200'}];
+let visitChecks = {}, riskChecks = {}, chipSel = {};
+let vName='', vPhone='', vJobType='Driveway Excavation', vAddr='', vSizeNotes='', vAccessNotes='', vExpect='', vAgreed='', vNotes='';
+// Weekly
+let incEntries=[{id:'i0',desc:'',amt:''}], expEntries=[{id:'e0',desc:'',amt:''}], outEntries=[{id:'o0',desc:'',amt:''}], wkChecks={}, taxDone=false;
+// Invoice
+let invLines=[{id:'l0',desc:'Excavation works — as agreed',qty:'1',rate:''}];
+let invNum='DG-001', invDate='', invCust='', invAddr='', invDep=0, invMat=0, invBal=0, invBank='Dream Groundworks', invSort='', invAcc='';
+let invPrice=0, invDesc='';
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function fmt(n){return '£'+Math.round(n||0).toLocaleString();}
+function fmtD(n){return '£'+(parseFloat(n)||0).toLocaleString();}
+function getPaid(j){return (parseFloat(j.dep)||0)+(parseFloat(j.mat)||0)+(parseFloat(j.bal)||0);}
+function getOwed(j){const q=parseFloat(j.quote)||0;return j.status==='cancelled'||j.status==='declined'?0:Math.max(0,q-getPaid(j));}
+function daysSince(d){return d?Math.floor((Date.now()-new Date(d))/86400000):null;}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function uid(){return Date.now().toString()+Math.random().toString(36).slice(2,5);}
+
+document.getElementById('hdrDate').textContent = new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+invDate = new Date().toISOString().split('T')[0];
+
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
+function nav(page){
+  curPage=page;
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+page).classList.add('active');
+  document.getElementById('bni-'+page).classList.add('active');
+  document.getElementById('waFloat').style.display = page==='home'?'flex':'none';
+  const r={home:renderHome,jobs:renderJobs,quote:renderQuote,money:renderMoney,msg:renderMsg,content:renderContent};
+  if(r[page]) r[page]();
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════
+function renderHome(){
+  const el=document.getElementById('pg-home');
+  const now=new Date(), mn=now.getMonth(), yr=now.getFullYear();
+  const active=jobs.filter(j=>j.status==='inprogress'||j.status==='confirmed').length;
+  const quoted=jobs.filter(j=>j.status==='quoted').length;
+  const allPaid=jobs.reduce((s,j)=>s+getPaid(j),0);
+  const monthJobs=jobs.filter(j=>{if(!j.created)return false;const d=new Date(j.created);return d.getMonth()===mn&&d.getFullYear()===yr;});
+  const mRev=monthJobs.reduce((s,j)=>s+getPaid(j),0);
+  const mProfit=mRev*(1-TAX);
+  const owed=jobs.reduce((s,j)=>s+getOwed(j),0);
+  const taxPot=allPaid*TAX;
+  // Week
+  const wkStart=new Date(now);wkStart.setDate(now.getDate()-((now.getDay()+6)%7));wkStart.setHours(0,0,0,0);
+  const wk=weekData[wkStart.toISOString().split('T')[0]]||{};
+  const wRev=wk.totalIn||0;
+  const followUp=jobs.filter(j=>j.status==='quoted'&&j.qsent&&daysSince(j.qsent)>=3);
+  const soonJobs=jobs.filter(j=>{if(!j.date||j.status==='completed'||j.status==='cancelled'||j.status==='declined')return false;const d=Math.ceil((new Date(j.date)-now)/86400000);return d>=0&&d<=2;});
+  const unpaid=jobs.filter(j=>getOwed(j)>0&&j.status!=='quoted'&&j.status!=='cancelled'&&j.status!=='declined');
+  const greet=now.getHours()<12?'Morning':now.getHours()<17?'Afternoon':'Evening';
+  el.innerHTML=`
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:900;text-transform:uppercase;margin-bottom:2px">Good ${greet}, <span style="color:#3CB70A">David</span></div>
+    <div style="font-size:0.8rem;color:#8892a4;margin-bottom:14px">Dream Groundworks overview</div>
+    <div class="dash-stats">
+      <div class="ds"><div class="ds-label">Active Jobs</div><div class="ds-val">${active}</div><div class="ds-sub">${quoted} quoted</div></div>
+      <div class="ds"><div class="ds-label">Month Revenue</div><div class="ds-val">${fmt(mRev)}</div><div class="ds-sub">Profit: ${fmt(mProfit)}</div></div>
+      <div class="ds"><div class="ds-label">Week Revenue</div><div class="ds-val">${fmt(wRev)}</div><div class="ds-sub">Profit: ${fmt(wRev*(1-TAX))}</div></div>
+      <div class="ds"><div class="ds-label">Tax Pot</div><div class="ds-val o">${fmt(taxPot)}</div><div class="ds-sub">Don't touch</div></div>
+    </div>
+    ${followUp.length||soonJobs.length||unpaid.length?`<div class="sec-label">Action Needed</div>
+    ${followUp.map(j=>`<div class="alert-card" onclick="nav('jobs')"><div class="at">Follow up: ${j.name}</div><div class="as">Quote sent ${daysSince(j.qsent)} days ago</div></div>`).join('')}
+    ${soonJobs.map(j=>`<div class="alert-card o" onclick="nav('jobs')"><div class="at">Starting soon: ${j.name}</div><div class="as">${j.date?new Date(j.date).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'}):''}</div></div>`).join('')}
+    ${unpaid.map(j=>`<div class="alert-card o" onclick="nav('money')"><div class="at">Payment owed: ${j.name}</div><div class="as">${fmtD(getOwed(j))} outstanding</div></div>`).join('')}`:''}
+    <div class="sec-label" style="margin-top:14px">Quick Actions</div>
+    <div class="qa-grid">
+      <div class="qa" onclick="openAddJob()"><div class="qa-icon">➕</div><div class="qa-text"><h4>Add Job</h4><p>New enquiry</p></div></div>
+      <div class="qa" onclick="nav('quote')"><div class="qa-icon">📐</div><div class="qa-text"><h4>Site Visit</h4><p>Quote calculator</p></div></div>
+      <div class="qa" onclick="nav('money')"><div class="qa-icon">💰</div><div class="qa-text"><h4>Money Check</h4><p>Weekly review</p></div></div>
+      <div class="qa" onclick="nav('msg')"><div class="qa-icon">💬</div><div class="qa-text"><h4>Messages</h4><p>Templates</p></div></div>
+      <div class="qa" onclick="nav('content')"><div class="qa-icon">📱</div><div class="qa-text"><h4>Content</h4><p>Plan posts</p></div></div>
+      <div class="qa" onclick="moneySubTab='invoice';nav('money')"><div class="qa-icon">🧾</div><div class="qa-text"><h4>Invoice</h4><p>Create & send</p></div></div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// JOBS
+// ═══════════════════════════════════════════
+const SL={quoted:'Quoted',confirmed:'Confirmed',inprogress:'In Progress',completed:'Completed',declined:'Declined',onhold:'On Hold',cancelled:'Cancelled'};
+const SC={quoted:'tq',confirmed:'tc',inprogress:'tp',completed:'td',declined:'tx',onhold:'to',cancelled:'tx'};
+const NEXT={quoted:'→ Confirm',confirmed:'→ In Progress',inprogress:'→ Complete',completed:'→ Decline',declined:'→ On Hold',onhold:'→ Quoted'};
+
+function renderJobs(){
+  const el=document.getElementById('pg-jobs');
+  let list=jobs.filter(j=>j.status!=='cancelled');
+  if(jobSubTab==='active') list=jobs.filter(j=>j.status==='inprogress'||j.status==='confirmed');
+  else if(jobSubTab==='quoted') list=jobs.filter(j=>j.status==='quoted');
+  else if(jobSubTab==='completed') list=jobs.filter(j=>j.status==='completed');
+  const tabs=['all','active','quoted','completed'];
+  const tl=['All','Active','Quoted','Done'];
+  el.innerHTML=`<button class="btn-g" onclick="openAddJob()">+ Add New Job</button>
+    <div class="stabs">${tabs.map((t,i)=>`<div class="stab ${jobSubTab===t?'active':''}" onclick="jobSubTab='${t}';renderJobs()">${tl[i]}</div>`).join('')}</div>
+    ${list.length?list.map(j=>buildJobCard(j)).join(''):`<div class="empty"><div class="empty-icon">🏗️</div><h3>No Jobs</h3><p>Tap the button above to add a job.</p></div>`}`;
+}
+
+function buildJobCard(j){
+  const q=parseFloat(j.quote)||0, paid=getPaid(j), owed=getOwed(j);
+  const dep=parseFloat(j.dep)||0, mat=parseFloat(j.mat)||0, bal=parseFloat(j.bal)||0;
+  const ds=j.qsent?daysSince(j.qsent):null;
+  const flag=j.status==='quoted'&&ds>=3?`<div style="background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.25);border-radius:5px;padding:6px 9px;margin-bottom:7px;font-size:0.7rem;color:#ff4444;font-weight:600">⚠️ Quote sent ${ds} days ago — follow up</div>`:'';
+  return `<div class="card">
+    ${flag}
+    <div class="card-hd"><div><div class="card-name">${j.name}</div><div class="card-meta">${j.type||''}${j.loc?' · '+j.loc:''}</div></div><div class="tag ${SC[j.status]||'td'}">${SL[j.status]||j.status}</div></div>
+    <div class="cgrid">
+      <div class="cdet"><div class="cdl">Date</div><div class="cdv">${j.date?new Date(j.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC'}</div></div>
+      <div class="cdet"><div class="cdl">Quote</div><div class="cdv g">${q?fmtD(q):'TBC'}</div></div>
+      <div class="cdet"><div class="cdl">Received</div><div class="cdv ${paid>0?'g':''}">${paid>0?fmtD(paid):'£0'}</div></div>
+      <div class="cdet"><div class="cdl">Owed</div><div class="cdv ${owed>0?'o':'g'}">${owed>0?fmtD(owed):'✓ Clear'}</div></div>
+    </div>
+    ${q>0?`<div class="pbar">
+      <div class="ps ${dep>0?'paid':''}"><div class="psl">Deposit ${dep>0?'✓':''}</div><div class="psv">${dep>0?fmtD(dep):'£'+Math.round(q*0.1)}</div></div>
+      <div class="ps ${mat>0?'paid':''}"><div class="psl">Materials ${mat>0?'✓':''}</div><div class="psv">${mat>0?fmtD(mat):'—'}</div></div>
+      <div class="ps ${bal>0?'paid':''}"><div class="psl">Balance ${bal>0?'✓':''}</div><div class="psv">${bal>0?fmtD(bal):owed>0?fmtD(owed):'—'}</div></div>
+    </div>`:''}
+    ${j.notes?`<div style="background:#0d1e36;border-radius:5px;padding:7px 9px;font-size:0.74rem;color:#8892a4;margin-bottom:7px;line-height:1.5">${j.notes}</div>`:''}
+    <div class="card-acts">
+      ${j.phone?`<button class="cbtn cb-g" onclick="window.location='tel:${j.phone}'">📞</button>`:''}
+      ${j.phone?`<button class="cbtn cb-w" onclick="window.open('https://wa.me/44${(j.phone||'').replace(/^0/,'').replace(/\s/g,'')}')">💬</button>`:''}
+      <button class="cbtn cb-s" onclick="cycleStatus('${j.id}')">${NEXT[j.status]||'Next'}</button>
+      <button class="cbtn cb-e" onclick="editJob('${j.id}')">Edit</button>
+      <button class="cbtn cb-d" onclick="delJob('${j.id}')">Del</button>
+    </div>
+  </div>`;
+}
+
+function openAddJob(){
+  editJobId=null;
+  document.getElementById('jModalTitle').textContent='Add New Job';
+  ['jName','jPhone','jLoc','jQuote','jDays','jDep','jMat','jBal','jNotes','jQSent'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('jType').value='Driveway Excavation';
+  document.getElementById('jStatus').value='quoted';
+  document.getElementById('jDate').value='';
+  openModal('jobModal');
+}
+
+function editJob(id){
+  const j=jobs.find(x=>x.id===id); if(!j) return;
+  editJobId=id;
+  document.getElementById('jModalTitle').textContent='Edit Job';
+  document.getElementById('jName').value=j.name||'';
+  document.getElementById('jPhone').value=j.phone||'';
+  document.getElementById('jType').value=j.type||'Driveway Excavation';
+  document.getElementById('jLoc').value=j.loc||'';
+  document.getElementById('jDate').value=j.date||'';
+  document.getElementById('jStatus').value=j.status||'quoted';
+  document.getElementById('jQuote').value=j.quote||'';
+  document.getElementById('jDays').value=j.days||'';
+  document.getElementById('jDep').value=j.dep||'';
+  document.getElementById('jMat').value=j.mat||'';
+  document.getElementById('jBal').value=j.bal||'';
+  document.getElementById('jNotes').value=j.notes||'';
+  document.getElementById('jQSent').value=j.qsent||'';
+  openModal('jobModal');
+}
+
+function saveJob(){
+  const name=document.getElementById('jName').value.trim();
+  if(!name){alert('Enter a customer name');return;}
+  const j={id:editJobId||uid(),name,phone:document.getElementById('jPhone').value.trim(),type:document.getElementById('jType').value,loc:document.getElementById('jLoc').value.trim(),date:document.getElementById('jDate').value,status:document.getElementById('jStatus').value,quote:document.getElementById('jQuote').value,days:document.getElementById('jDays').value,dep:document.getElementById('jDep').value,mat:document.getElementById('jMat').value,bal:document.getElementById('jBal').value,notes:document.getElementById('jNotes').value.trim(),qsent:document.getElementById('jQSent').value,created:editJobId?jobs.find(x=>x.id===editJobId)?.created:new Date().toISOString()};
+  jobs=editJobId?jobs.map(x=>x.id===editJobId?j:x):[j,...jobs];
+  save('dgj',jobs); closeModal('jobModal'); renderJobs(); if(curPage==='home') renderHome();
+}
+
+function delJob(id){if(confirm('Delete this job?')){jobs=jobs.filter(x=>x.id!==id);save('dgj',jobs);renderJobs();if(curPage==='home')renderHome();}}
+function cycleStatus(id){
+  const order=['quoted','confirmed','inprogress','completed','declined','onhold'];
+  const j=jobs.find(x=>x.id===id); if(!j) return;
+  j.status=order[(order.indexOf(j.status)+1)%order.length];
+  save('dgj',jobs); renderJobs(); if(curPage==='home') renderHome();
+}
+
+// ═══════════════════════════════════════════
+// QUOTE / SITE VISIT
+// ═══════════════════════════════════════════
+const VISIT_CL=[{id:'v1',l:'Take before photos',d:'Wide angle of whole site + close ups'},{id:'v2',l:'Measure all areas',d:'Length × width × depth for each section'},{id:'v3',l:'Check machine access',d:'Will the digger fit? Measure if tight'},{id:'v4',l:'Check for utilities',d:'Ask customer if services located'},{id:'v5',l:'Check ground conditions',d:'What is underneath?'},{id:'v6',l:'Check skip placement',d:'Where will skip go? Permit needed?'},{id:'v7',l:'Check overhead cables',d:'Any cables above working area?'},{id:'v8',l:'Check neighbouring property',d:'Risk to next door walls or fences?'},{id:'v9',l:'Confirm expectations',d:'What exactly do they want?'},{id:'v10',l:'Discuss payment terms',d:'Explain your 3-stage payment system'}];
+const RISK_CL=[{id:'r1',l:'Utilities not located',d:'Customer has not confirmed services found'},{id:'r2',l:'Neighbouring boundary risk',d:'Digging close to next door wall or fence'},{id:'r3',l:'Overhead cables',d:'Machine height could be an issue'},{id:'r4',l:'Rocky or unknown ground',d:'Could slow progress significantly'},{id:'r5',l:'Very tight access',d:'Extra time getting machine in and out'},{id:'r6',l:'Existing structures nearby',d:'Walls or drainage that need protecting'}];
+
+function renderQuote(){
+  const el=document.getElementById('pg-quote');
+  const tabs=[{k:'visit',l:'Site Visit'},{k:'calc',l:'Calculator'},{k:'result',l:'Quote'},{k:'saved',l:'Saved'}];
+  el.innerHTML=`<div class="stabs">${tabs.map(t=>`<div class="stab ${quoteSubTab===t.k?'active':''}" onclick="quoteSubTab='${t.k}';renderQuote()">${t.l}</div>`).join('')}</div><div id="qContent"></div>`;
+  const qc=document.getElementById('qContent');
+  if(quoteSubTab==='visit') renderVisitTab(qc);
+  else if(quoteSubTab==='calc') renderCalcTab(qc);
+  else if(quoteSubTab==='result') renderResultTab(qc);
+  else renderSavedQuotes(qc);
+}
+
+function renderVisitTab(el){
+  el.innerHTML=`
+  <div class="sec"><div class="sec-title">👤 Customer</div>
+    <div class="fg"><label>Name</label><input type="text" id="vN" value="${vName}" placeholder="John Smith" onchange="vName=this.value"></div>
+    <div class="fr"><div class="fg"><label>Phone</label><input type="tel" id="vP" value="${vPhone}" placeholder="07700 000000" onchange="vPhone=this.value"></div>
+    <div class="fg"><label>Job Type</label><select id="vJT" onchange="vJobType=this.value">${['Driveway Excavation','Foundation Digging','Landscaping Groundworks','Ground Levelling','Garden Clearance','Digger Hire','Other'].map(o=>`<option ${vJobType===o?'selected':''}>${o}</option>`).join('')}</select></div></div>
+    <div class="fg"><label>Address</label><input type="text" id="vA" value="${vAddr}" placeholder="123 Main Street, Paisley" onchange="vAddr=this.value"></div>
+  </div>
+  <div class="sec"><div class="sec-title">✅ On-Site Checklist</div>
+    ${VISIT_CL.map(c=>`<div class="cl-item ${visitChecks[c.id]?'done':''}" onclick="visitChecks['${c.id}']=!visitChecks['${c.id}'];this.className='cl-item'+(visitChecks['${c.id}']?' done':'')"><div class="cl-box"><div class="cl-tick">✓</div></div><div class="cl-text"><h4>${c.l}</h4><p>${c.d}</p></div></div>`).join('')}
+  </div>
+  <div class="sec"><div class="sec-title">📐 Measurements</div>
+    <div id="measList"></div>
+    <button class="btn-add" onclick="addMeas()">+ Add Area</button>
+    <div id="measTotals" class="hidden" style="background:#0d1e36;border-radius:8px;padding:11px;margin-top:8px">
+      <div class="mt-title">Total Across All Areas</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+        <div><div class="mr-label">Area</div><div class="mr-val" id="tArea">0 m²</div></div>
+        <div><div class="mr-label">Volume</div><div class="mr-val" id="tVol">0 m³</div></div>
+        <div><div class="mr-label">Skips Est.</div><div class="mr-val" style="color:#ffa500" id="tSkips">0</div></div>
+      </div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Size Notes</label><input type="text" id="vSN" value="${vSizeNotes}" placeholder="L-shaped, narrow access, sloping" onchange="vSizeNotes=this.value"></div>
+  </div>
+  <div class="sec"><div class="sec-title">🪨 Ground Conditions</div>
+    <div class="fg"><label>Surface Type</label>
+      <div class="chips">${['Tarmac','Concrete','Grass/Soil','Gravel','Block Paving','Mixed'].map(s=>`<div class="chip ${(chipSel['surface']||[]).includes(s)?'on':''}" onclick="toggleChip('${s}','surface');this.className='chip '+((chipSel['surface']||[]).includes('${s}')?'':'on')">${s}</div>`).join('')}</div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Ground Type</label>
+      <div class="chips">${['Soft Soil','Clay','Rocky/Stony','Hardcore/Rubble','Unknown'].map(s=>`<div class="chip ${(chipSel['soil']||[]).includes(s)?'on':''}" onclick="toggleChip('${s}','soil');this.className='chip '+((chipSel['soil']||[]).includes('${s}')?'':'on')">${s}</div>`).join('')}</div>
+    </div>
+  </div>
+  <div class="sec"><div class="sec-title">🚧 Access</div>
+    <div class="chips">${['Wide — Easy','Tight but Possible','Very Tight','No Machine Access'].map(s=>`<div class="chip ${(chipSel['access']||[]).includes(s)?'on':''}" onclick="toggleChip('${s}','access');this.className='chip '+((chipSel['access']||[]).includes('${s}')?'':'on')">${s}</div>`).join('')}</div>
+    <div class="fg" style="margin-top:8px"><label>Access Notes</label><input type="text" id="vAN" value="${vAccessNotes}" placeholder="e.g. Side gate 750mm — need micro digger" onchange="vAccessNotes=this.value"></div>
+  </div>
+  <div class="sec"><div class="sec-title">⚠️ Risk Flags</div>
+    ${RISK_CL.map(c=>`<div class="cl-item ${riskChecks[c.id]?'done':''}" onclick="riskChecks['${c.id}']=!riskChecks['${c.id}'];this.className='cl-item'+(riskChecks['${c.id}']?' done':'')"><div class="cl-box"><div class="cl-tick">✓</div></div><div class="cl-text"><h4>${c.l}</h4><p>${c.d}</p></div></div>`).join('')}
+  </div>
+  <div class="sec"><div class="sec-title">⚡ Utilities</div>
+    <div class="dbox"><strong>Always ask the customer</strong> to locate all underground services before work starts. This is their responsibility.</div>
+    <div class="chips" style="margin-top:10px">${['Customer confirmed located','Not yet — to confirm','Unknown — dig with caution'].map(s=>`<div class="chip ${(chipSel['util']||[]).includes(s)?'on':''}" onclick="toggleChip('${s}','util');this.className='chip '+((chipSel['util']||[]).includes('${s}')?'':'on')">${s}</div>`).join('')}</div>
+  </div>
+  <div class="sec"><div class="sec-title">💬 Customer Notes</div>
+    <div class="fg"><label>What do they want?</label><textarea id="vE" onchange="vExpect=this.value" placeholder="e.g. Level for paving, happy with next-day spoil removal">${vExpect}</textarea></div>
+    <div class="fg"><label>Anything agreed on site</label><textarea id="vAg" onchange="vAgreed=this.value" placeholder="e.g. Will protect right-side wall, access for neighbour">${vAgreed}</textarea></div>
+  </div>
+  <div class="sec"><div class="sec-title">📝 General Notes</div>
+    <textarea style="width:100%;background:#0d1e36;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px;border-radius:6px;font-family:Barlow,sans-serif;font-size:0.86rem;outline:none;min-height:75px;resize:vertical" id="vGN" onchange="vNotes=this.value" placeholder="Parking, dogs, gate codes, anything else...">${vNotes}</textarea>
+  </div>
+  <button class="btn-g" onclick="quoteSubTab='calc';renderQuote()">Next — Calculate Quote →</button>`;
+  renderMeasList();
+}
+
+// MEASUREMENTS
+function addMeas(){
+  measurements.push({id:uid(), name:'Area '+(measurements.length+1), l:'', w:'', d:'200'});
+  renderMeasList();
+}
+function delMeas(id){
+  if(measurements.length<=1){
+    measurements=[{id:uid(),name:'Area 1',l:'',w:'',d:'200'}];
+  } else {
+    measurements=measurements.filter(m=>m.id!==id);
+  }
+  renderMeasList();
+}
+function renderMeasList(){
+  const el=document.getElementById('measList'); if(!el) return;
+  el.innerHTML=measurements.map((m,idx)=>{
+    const l=parseFloat(m.l)||0, w=parseFloat(m.w)||0, d=parseFloat(m.d)||200;
+    const area=l&&w?+(l*w).toFixed(2):0, vol=area?(+(area*(d/1000)).toFixed(2)):0;
+    const skips=area?Math.ceil(vol/6):0;
+    return `<div style="background:#0d1e36;border-radius:8px;padding:11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <input type="text" value="${m.name}" placeholder="Area name" style="background:none;border:none;color:#3CB70A;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900;text-transform:uppercase;outline:none;flex:1" onchange="measurements.find(x=>x.id==='${m.id}').name=this.value">
+        <button onclick="delMeas('${m.id}')" style="background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.25);color:#ff4444;border-radius:4px;padding:3px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:Barlow,sans-serif;margin-left:8px">Remove</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+        <div>
+          <div style="font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Length (m)</div>
+          <input type="number" inputmode="decimal" value="${m.l}" placeholder="0" style="width:100%;background:#112240;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px 8px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:1rem;outline:none;text-align:center;-webkit-appearance:none" oninput="measurements.find(x=>x.id==='${m.id}').l=this.value;calcMeasTotals()">
+        </div>
+        <div>
+          <div style="font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Width (m)</div>
+          <input type="number" inputmode="decimal" value="${m.w}" placeholder="0" style="width:100%;background:#112240;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px 8px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:1rem;outline:none;text-align:center;-webkit-appearance:none" oninput="measurements.find(x=>x.id==='${m.id}').w=this.value;calcMeasTotals()">
+        </div>
+        <div>
+          <div style="font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Depth (mm)</div>
+          <input type="number" inputmode="decimal" value="${m.d}" placeholder="200" style="width:100%;background:#112240;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px 8px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:1rem;outline:none;text-align:center;-webkit-appearance:none" oninput="measurements.find(x=>x.id==='${m.id}').d=this.value;calcMeasTotals()">
+        </div>
+      </div>
+      ${area>0?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:rgba(60,183,10,0.06);border-radius:6px;padding:8px;text-align:center">
+        <div><div style="font-size:0.56rem;color:#8892a4;text-transform:uppercase;margin-bottom:2px">Area</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:900;color:#3CB70A">${area}m²</div></div>
+        <div><div style="font-size:0.56rem;color:#8892a4;text-transform:uppercase;margin-bottom:2px">Volume</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:900;color:#3CB70A">${vol}m³</div></div>
+        <div><div style="font-size:0.56rem;color:#8892a4;text-transform:uppercase;margin-bottom:2px">Skips ~</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:900;color:#ffa500">${skips}</div></div>
+        <div><div style="font-size:0.56rem;color:#8892a4;text-transform:uppercase;margin-bottom:2px">Area #</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:900;color:#8892a4">${idx+1}</div></div>
+      </div>`:'<div style="font-size:0.72rem;color:#8892a4;text-align:center;padding:4px 0">Enter length and width to see calculations</div>'}
+    </div>`;
+  }).join('');
+  calcMeasTotals();
+}
+function calcMeasTotals(){
+  let tArea=0, tVol=0;
+  measurements.forEach(m=>{const l=parseFloat(m.l)||0,w=parseFloat(m.w)||0,d=parseFloat(m.d)||200;if(l&&w){tArea+=l*w;tVol+=(l*w)*(d/1000);}});
+  const tSkips=Math.ceil(tVol/6);
+  const totEl=document.getElementById('measTotals');
+  if(totEl){
+    totEl.classList.toggle('hidden',tArea===0);
+    if(tArea>0){
+      document.getElementById('tArea').textContent=tArea.toFixed(1)+' m²';
+      document.getElementById('tVol').textContent=tVol.toFixed(1)+' m³';
+      document.getElementById('tSkips').textContent=tSkips;
+    }
+  }
+  qSkips=tSkips;
+  const sv=document.getElementById('qSkipsVal'); if(sv) sv.textContent=qSkips;
+}
+function toggleChip(val,group){
+  if(!chipSel[group]) chipSel[group]=[];
+  if(chipSel[group].includes(val)) chipSel[group]=chipSel[group].filter(v=>v!==val);
+  else chipSel[group].push(val);
+}
+
+// CALCULATOR
+function renderCalcTab(el){
+  calcQuote();
+  el.innerHTML=`
+  <button class="back-btn" onclick="quoteSubTab='visit';renderQuote()">← Back to Site Visit</button>
+  <div class="sec"><div class="sec-title">📅 Days on Site</div>
+    <div class="stepper"><button class="step-btn" onclick="qDays=Math.max(0.5,qDays-0.5);document.getElementById('qDaysVal').textContent=qDays%1===0?qDays:qDays.toFixed(1);calcQuote()">−</button><div class="step-val" id="qDaysVal">${qDays%1===0?qDays:qDays.toFixed(1)}</div><button class="step-btn" onclick="qDays+=0.5;document.getElementById('qDaysVal').textContent=qDays%1===0?qDays:qDays.toFixed(1);calcQuote()">+</button></div>
+    <div class="ibox" style="margin-top:8px"><strong>Tip:</strong> Always add at least half a day buffer.</div>
+  </div>
+  <div class="sec"><div class="sec-title">🚜 Machine Hire</div>
+    <div class="fr">
+      <div class="fg"><label>Weekly hire (£)</label><input type="number" id="qHire" value="260" oninput="calcQuote()"></div>
+      <div class="fg"><label>Days used this week</label><div class="stepper"><button class="step-btn" onclick="qHireDays=Math.max(1,qHireDays-1);document.getElementById('qHDVal').textContent=qHireDays;calcQuote()">−</button><div class="step-val" id="qHDVal">${qHireDays}</div><button class="step-btn" onclick="qHireDays=Math.min(7,qHireDays+1);document.getElementById('qHDVal').textContent=qHireDays;calcQuote()">+</button></div></div>
+    </div>
+    <div class="fg"><label>Fuel per day (£)</label><input type="number" id="qFuel" value="35" oninput="calcQuote()"></div>
+  </div>
+  <div class="sec"><div class="sec-title">💷 Your Day Rate</div>
+    <div class="chips">${[450,475,500,550,600].map(r=>`<div class="chip ${r===500?'on':''}" onclick="document.getElementById('qRate').value=${r};document.querySelectorAll('#rateChips .chip').forEach(c=>c.classList.remove('on'));this.classList.add('on');calcQuote()">${'£'+r}</div>`).join('')}</div>
+    <div id="rateChips" style="display:none"></div>
+    <div class="fg" style="margin-top:8px"><label>Day rate (£)</label><input type="number" id="qRate" value="500" oninput="calcQuote()"></div>
+  </div>
+  <div class="sec"><div class="sec-title">🗑️ Skips & Disposal</div>
+    <div class="fr">
+      <div class="fg"><label>Number of skips</label><div class="stepper"><button class="step-btn" onclick="qSkips=Math.max(0,qSkips-1);document.getElementById('qSkipsVal').textContent=qSkips;calcQuote()">−</button><div class="step-val" id="qSkipsVal">${qSkips}</div><button class="step-btn" onclick="qSkips++;document.getElementById('qSkipsVal').textContent=qSkips;calcQuote()">+</button></div></div>
+      <div class="fg"><label>Cost per skip (£)</label><input type="number" id="qSkipCost" value="180" oninput="calcQuote()"></div>
+    </div>
+    ${qSkips>0?`<div class="ibox"><strong>Based on measurements:</strong> ${qSkips} skip${qSkips!==1?'s':''} suggested</div>`:''}
+  </div>
+  <div class="sec"><div class="sec-title">🧱 Extra Costs</div>
+    <div class="fr">
+      <div class="fg"><label>Materials (£)</label><input type="number" id="qMat" value="0" oninput="calcQuote()"></div>
+      <div class="fg"><label>Other (£)</label><input type="number" id="qOther" value="0" oninput="calcQuote()"></div>
+    </div>
+    <div class="fg"><label>Risk premium</label>
+      <div class="chips">${[{l:'Standard',v:0},{l:'+10%',v:10},{l:'+15%',v:15},{l:'+25%',v:25}].map(r=>`<div class="chip ${qRisk===r.v?'on':''}" onclick="qRisk=${r.v};document.querySelectorAll('.rchip').forEach(c=>c.classList.remove('on'));this.classList.add('on');calcQuote()" class="chip rchip ${qRisk===r.v?'on':''}">${r.l}</div>`).join('')}</div>
+    </div>
+  </div>
+  <div class="sec"><div class="sec-title">📈 Profit Margin</div>
+    <div class="slider-row"><input type="range" class="slider" id="qMargin" min="0" max="40" value="20" oninput="document.getElementById('qMarginVal').textContent=this.value+'%';calcQuote()"><div class="sval" id="qMarginVal">20%</div></div>
+    <div class="ibox" style="margin-top:8px"><strong>15–20%</strong> standard. <strong>20–30%</strong> for risky jobs.</div>
+  </div>
+  <button class="btn-g" onclick="calcQuote();quoteSubTab='result';renderQuote()">Calculate Quote →</button>`;
+}
+
+function calcQuote(){
+  const hire=parseFloat(document.getElementById('qHire')?.value)||260;
+  const fuel=parseFloat(document.getElementById('qFuel')?.value)||35;
+  const rate=parseFloat(document.getElementById('qRate')?.value)||500;
+  const sc=parseFloat(document.getElementById('qSkipCost')?.value)||180;
+  const mat=parseFloat(document.getElementById('qMat')?.value)||0;
+  const other=parseFloat(document.getElementById('qOther')?.value)||0;
+  const margin=parseFloat(document.getElementById('qMargin')?.value)||20;
+  const hpd=(hire/qHireDays);
+  const costs=(hpd*qDays)+(fuel*qDays)+(qSkips*sc)+mat+other;
+  const wage=rate*qDays;
+  const sub=costs+wage;
+  const risk=sub*(qRisk/100);
+  const marg=(sub+risk)*(margin/100);
+  const raw=sub+risk+marg;
+  const rounded=Math.ceil(raw/50)*50;
+  const profit=rounded-costs-wage;
+  qResult={quote:rounded,costs,wage,profit,afterTax:profit*0.73,margin,days:qDays,materials:mat,deposit:Math.round(rounded*0.1),balance:rounded-Math.round(rounded*0.1)-mat};
+}
+
+function renderResultTab(el){
+  if(!qResult) calcQuote();
+  const r=qResult;
+  const checksGood=VISIT_CL.filter(c=>visitChecks[c.id]).length;
+  const risksFound=RISK_CL.filter(c=>riskChecks[c.id]).length;
+  const msg=`Hi ${vName||'[Name]'}, great to meet you today — here's your quote for the ${(vJobType||'job').toLowerCase()}${vAddr?' at '+vAddr:''}.
+
+Price: £${r.quote.toLocaleString()} all in.
+
+Payment terms:
+— 10% deposit (£${r.deposit.toLocaleString()}) to secure your start date
+— Materials payment${r.materials>0?' (£'+r.materials.toLocaleString()+')':''} 1 week before we start
+— Balance (£${r.balance.toLocaleString()}) on completion
+
+${vAgreed?'As discussed: '+vAgreed+'\n\n':''}Reply to confirm and I\'ll send bank details.
+
+Thanks, David`;
+
+  el.innerHTML=`
+  <button class="back-btn" onclick="quoteSubTab='calc';renderQuote()">← Back to Calculator</button>
+  <div class="result-box">
+    <div class="rb-label">Your Quote Price</div>
+    <div class="rb-val">£${r.quote.toLocaleString()}</div>
+    <div class="rb-sub">Suggest £${(r.quote-50).toLocaleString()} – £${(r.quote+100).toLocaleString()}</div>
+    <div class="rgrid">
+      <div class="ri"><div class="ril">Costs</div><div class="riv rv-r">${fmt(r.costs)}</div></div>
+      <div class="ri"><div class="ril">Wage</div><div class="riv rv-w">${fmt(r.wage)}</div></div>
+      <div class="ri"><div class="ril">Profit</div><div class="riv rv-g">${fmt(r.profit)}</div></div>
+      <div class="ri"><div class="ril">After Tax</div><div class="riv rv-g">${fmt(r.afterTax)}</div></div>
+      <div class="ri"><div class="ril">Per Day</div><div class="riv rv-w">${fmt(r.quote/r.days)}</div></div>
+      <div class="ri"><div class="ril">Margin</div><div class="riv rv-o">${r.margin}%</div></div>
+    </div>
+    <div class="pay3">
+      <div class="p3"><div class="p3l">Deposit</div><div class="p3v">£${r.deposit.toLocaleString()}</div><div class="p3s">On booking</div></div>
+      <div class="p3"><div class="p3l">Materials</div><div class="p3v">${r.materials>0?'£'+r.materials.toLocaleString():'—'}</div><div class="p3s">1 wk before</div></div>
+      <div class="p3"><div class="p3l">Balance</div><div class="p3v">£${r.balance.toLocaleString()}</div><div class="p3s">On completion</div></div>
+    </div>
+    <button onclick="document.getElementById('sqName').value='${vName||''}';openModal('sqModal')" style="margin-top:10px;width:100%;background:rgba(60,183,10,0.1);border:1px solid rgba(60,183,10,0.3);color:#3CB70A;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;padding:9px;border-radius:6px;cursor:pointer">Save This Quote</button>
+  </div>
+  <div class="sec">
+    <div class="sec-title">📋 Site Summary</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div class="cdet"><div class="cdl">Customer</div><div class="cdv">${vName||'—'}</div></div>
+      <div class="cdet"><div class="cdl">Areas</div><div class="cdv">${measurements.length} area${measurements.length!==1?'s':''}</div></div>
+      <div class="cdet"><div class="cdl">Checks Done</div><div class="cdv g">${checksGood}/${VISIT_CL.length}</div></div>
+      <div class="cdet" style="${risksFound>0?'border:1px solid rgba(255,68,68,0.25)':''}"><div class="cdl">Risks Flagged</div><div class="cdv ${risksFound>0?'r':'g'}">${risksFound}</div></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">💬 Quote Message — Tap to Copy</div>
+    <div id="qMsg" style="background:#0d1e36;border-radius:7px;padding:11px;font-size:0.82rem;line-height:1.7;color:#ccd6f6;white-space:pre-wrap;margin-bottom:10px;cursor:pointer" onclick="copyQMsg()">${msg}</div>
+    <button id="qMsgBtn" onclick="copyQMsg()" style="width:100%;background:#3CB70A;color:#0a1628;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.9rem;letter-spacing:0.08em;text-transform:uppercase;border:none;padding:12px;border-radius:6px;cursor:pointer">Copy Message</button>
+  </div>`;
+}
+
+function copyQMsg(){
+  const msg=document.getElementById('qMsg')?.textContent;
+  if(!msg) return;
+  navigator.clipboard.writeText(msg).catch(()=>{const ta=document.createElement('textarea');ta.value=msg;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
+  const btn=document.getElementById('qMsgBtn'); if(btn){btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy Message',2000);}
+}
+
+function doSaveQuote(){
+  if(!qResult){closeModal('sqModal');return;}
+  const name=document.getElementById('sqName').value.trim()||vName||'Unnamed';
+  savedQuotes.unshift({id:uid(),name,quote:qResult.quote,days:qResult.days,profit:qResult.afterTax,jobType:vJobType,addr:vAddr,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})});
+  save('dgq',savedQuotes); closeModal('sqModal'); alert('Quote saved ✓');
+}
+
+function renderSavedQuotes(el){
+  el.innerHTML=savedQuotes.length?savedQuotes.map(q=>`<div class="card">
+    <div class="card-hd"><div><div class="card-name">${q.name}</div><div class="card-meta">${q.jobType||''} · ${q.days} days · ${q.date}</div></div><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:900;color:#3CB70A">£${q.quote.toLocaleString()}</div></div>
+    <div style="font-size:0.72rem;color:#8892a4">Profit after tax: £${Math.round(q.profit).toLocaleString()}${q.addr?' · '+q.addr:''}</div>
+    <div style="margin-top:8px"><button class="cbtn cb-d" onclick="savedQuotes=savedQuotes.filter(x=>x.id!=='${q.id}');save('dgq',savedQuotes);renderQuote()">Delete</button></div>
+  </div>`).join(''):`<div class="empty"><div class="empty-icon">💾</div><h3>No Saved Quotes</h3><p>Complete a site visit and save your quote.</p></div>`;
+}
+
+// ═══════════════════════════════════════════
+// MONEY
+// ═══════════════════════════════════════════
+const WK_CL=[{id:'w1',l:'Move tax pot money',d:'Transfer 27% to your tax account'},{id:'w2',l:'Chase unpaid invoices',d:'Follow up invoices over 7 days old'},{id:'w3',l:'Send outstanding quotes',d:'Any site visits done this week'},{id:'w4',l:'Follow up old quotes',d:'Quotes sent 3+ days ago no reply'},{id:'w5',l:'Post this week content',d:'At least 3 posts across TikTok and Instagram'},{id:'w6',l:'Confirm next week jobs',d:'Message customers starting next week'},{id:'w7',l:'Review your week',d:'What went well? What needs improving?'}];
+
+function getWkKey(off=0){const d=new Date(),m=new Date(d);m.setDate(d.getDate()-((d.getDay()+6)%7)+(off*7));m.setHours(0,0,0,0);return m.toISOString().split('T')[0];}
+function getWkLabel(off=0){const d=new Date(),m=new Date(d);m.setDate(d.getDate()-((d.getDay()+6)%7)+(off*7));const s=new Date(m);s.setDate(m.getDate()+6);return m.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' – '+s.toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
+
+function loadWk(){
+  const k=getWkKey(weekOffset), w=weekData[k]||{};
+  incEntries=w.inc||[{id:'i0',desc:'',amt:''}];
+  expEntries=w.exp||[{id:'e0',desc:'',amt:''}];
+  outEntries=w.out||[{id:'o0',desc:'',amt:''}];
+  wkChecks=w.checks||{}; taxDone=w.taxDone||false;
+}
+function saveWk(){
+  const k=getWkKey(weekOffset);
+  const tIn=incEntries.reduce((s,e)=>s+(parseFloat(e.amt)||0),0);
+  const tExp=expEntries.reduce((s,e)=>s+(parseFloat(e.amt)||0),0);
+  weekData[k]={inc:incEntries,exp:expEntries,out:outEntries,checks:wkChecks,taxDone,totalIn:tIn,totalExp:tExp,takeHome:tIn*(1-TAX)-tExp,taxPot:tIn*TAX};
+  save('dgw',weekData);
+}
+function addEntry(type){
+  const e={id:uid(),desc:'',amt:''};
+  if(type==='inc') incEntries.push(e);
+  else if(type==='exp') expEntries.push(e);
+  else outEntries.push(e);
+  saveWk(); renderMoney();
+}
+function delEntry(type,id){
+  if(type==='inc') incEntries=incEntries.filter(e=>e.id!==id);
+  else if(type==='exp') expEntries=expEntries.filter(e=>e.id!==id);
+  else outEntries=outEntries.filter(e=>e.id!==id);
+  saveWk(); renderMoney();
+}
+function updEntry(type,id,field,val){
+  const arr=type==='inc'?incEntries:type==='exp'?expEntries:outEntries;
+  const e=arr.find(x=>x.id===id); if(e) e[field]=val; saveWk();
+  const tIn=incEntries.reduce((s,e)=>s+(parseFloat(e.amt)||0),0);
+  const tEl=document.getElementById('wkTotSec'); if(tEl) tEl.innerHTML=buildWkTots(tIn);
+}
+
+function buildWkTots(tIn){
+  const tExp=expEntries.reduce((s,e)=>s+(parseFloat(e.amt)||0),0);
+  return `<div class="mrow"><div class="ml">Total in this week</div><div class="mv mv-g">${fmt(tIn)}</div></div>
+    <div class="mrow"><div class="ml">Move to tax pot</div><div class="mv mv-o">${fmt(tIn*TAX)}</div></div>
+    <div class="mrow"><div class="ml">Take home profit</div><div class="mv mv-g">${fmt(Math.max(0,tIn*(1-TAX)-tExp))}</div></div>`;
+}
+
+function renderMoney(){
+  const el=document.getElementById('pg-money');
+  const tabs=[{k:'week',l:'Weekly Check'},{k:'overview',l:'Overview'},{k:'invoice',l:'Invoice'}];
+  el.innerHTML=`<div class="stabs">${tabs.map(t=>`<div class="stab ${moneySubTab===t.k?'active':''}" onclick="moneySubTab='${t.k}';renderMoney()">${t.l}</div>`).join('')}</div><div id="mContent"></div>`;
+  const mc=document.getElementById('mContent');
+  if(moneySubTab==='week') renderWeekly(mc);
+  else if(moneySubTab==='overview') renderOverview(mc);
+  else renderInvoice(mc);
+}
+
+function renderWeekly(el){
+  loadWk();
+  const tIn=incEntries.reduce((s,e)=>s+(parseFloat(e.amt)||0),0);
+  const label=weekOffset===0?'This Week':weekOffset===-1?'Last Week':getWkLabel(weekOffset);
+  el.innerHTML=`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900;color:#3CB70A;text-transform:uppercase">${label}</div><div style="font-size:0.7rem;color:#8892a4;margin-top:1px">${getWkLabel(weekOffset)}</div></div>
+    <div style="display:flex;gap:6px">
+      <button onclick="weekOffset--;loadWk();renderMoney()" style="background:rgba(60,183,10,0.1);border:1px solid rgba(60,183,10,0.25);color:#3CB70A;padding:5px 12px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">◀</button>
+      <button onclick="if(weekOffset<0){weekOffset++;loadWk();renderMoney()}" style="background:rgba(60,183,10,0.1);border:1px solid rgba(60,183,10,0.25);color:#3CB70A;padding:5px 12px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">▶</button>
+    </div>
+  </div>
+  <div class="tax-box">
+    <div class="tax-title">Move to Tax Pot This Week</div>
+    <div class="tax-amt">${fmt(tIn*TAX)}</div>
+    <div class="tax-sub">27% of this week's income</div>
+    <button onclick="taxDone=!taxDone;saveWk();renderMoney()" style="margin-top:10px;width:100%;background:${taxDone?'rgba(60,183,10,0.15)':'#ffa500'};color:${taxDone?'#3CB70A':'#0a1628'};border:${taxDone?'1px solid #3CB70A':'none'};font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.85rem;letter-spacing:0.07em;text-transform:uppercase;padding:11px;border-radius:6px;cursor:pointer">${taxDone?'✓ Moved to Tax Pot':'Mark as Moved'}</button>
+  </div>
+  <div class="sec"><div class="sec-title">💰 Income</div>
+    ${incEntries.map(e=>`<div class="entry-row"><input class="e-desc" type="text" placeholder="e.g. John Smith — driveway" value="${e.desc}" onchange="updEntry('inc','${e.id}','desc',this.value)"><input class="e-amt" type="number" placeholder="£" value="${e.amt}" onchange="updEntry('inc','${e.id}','amt',this.value)"><button class="e-del" onclick="delEntry('inc','${e.id}')">×</button></div>`).join('')}
+    <button class="btn-add" onclick="addEntry('inc')">+ Add Income</button>
+  </div>
+  <div class="sec"><div class="sec-title">💸 Expenses</div>
+    ${expEntries.map(e=>`<div class="entry-row"><input class="e-desc" type="text" placeholder="e.g. Skip hire" value="${e.desc}" onchange="updEntry('exp','${e.id}','desc',this.value)"><input class="e-amt" type="number" placeholder="£" value="${e.amt}" onchange="updEntry('exp','${e.id}','amt',this.value)"><button class="e-del" onclick="delEntry('exp','${e.id}')">×</button></div>`).join('')}
+    <button class="btn-add" onclick="addEntry('exp')">+ Add Expense</button>
+  </div>
+  <div class="sec"><div class="sec-title">⏳ Outstanding</div>
+    ${outEntries.map(e=>`<div class="entry-row"><input class="e-desc" type="text" placeholder="e.g. Shelby McAllister" value="${e.desc}" onchange="updEntry('out','${e.id}','desc',this.value)"><input class="e-amt" type="number" placeholder="£" value="${e.amt}" onchange="updEntry('out','${e.id}','amt',this.value)"><button class="e-del" onclick="delEntry('out','${e.id}')">×</button></div>`).join('')}
+    <button class="btn-add" onclick="addEntry('out')">+ Add Outstanding</button>
+  </div>
+  <div class="sec" id="wkTotSec">${buildWkTots(tIn)}</div>
+  <div class="sec"><div class="sec-title">✅ Friday Checklist</div>
+    ${WK_CL.map(c=>`<div class="cl-item ${wkChecks[c.id]?'done':''}" onclick="wkChecks['${c.id}']=!wkChecks['${c.id}'];saveWk();this.className='cl-item'+(wkChecks['${c.id}']?' done':'')"><div class="cl-box"><div class="cl-tick">✓</div></div><div class="cl-text"><h4>${c.l}</h4><p>${c.d}</p></div></div>`).join('')}
+  </div>`;
+}
+
+function renderOverview(el){
+  const now=new Date(), mn=now.getMonth(), yr=now.getFullYear();
+  const allPaid=jobs.reduce((s,j)=>s+getPaid(j),0);
+  const monthJobs=jobs.filter(j=>{if(!j.created)return false;const d=new Date(j.created);return d.getMonth()===mn&&d.getFullYear()===yr;});
+  const mRev=monthJobs.reduce((s,j)=>s+getPaid(j),0);
+  const mTax=mRev*TAX, mProfit=mRev*(1-TAX);
+  const owed=jobs.reduce((s,j)=>s+getOwed(j),0);
+  const taxPot=allPaid*TAX;
+  const pipeline=jobs.filter(j=>j.status==='quoted').reduce((s,j)=>s+(parseFloat(j.quote)||0),0);
+  const done=jobs.filter(j=>j.status==='completed'&&j.date&&new Date(j.date).getMonth()===mn).length;
+  const wkStart=new Date(now);wkStart.setDate(now.getDate()-((now.getDay()+6)%7));wkStart.setHours(0,0,0,0);
+  const wk=weekData[wkStart.toISOString().split('T')[0]]||{};
+  const wRev=wk.totalIn||0, wTax=wRev*TAX, wProfit=wRev*(1-TAX);
+  el.innerHTML=`
+  <div class="money-grid">
+    <div class="mg"><div class="mgl">Month Revenue</div><div class="mgv">${fmt(mRev)}</div><div class="mgs">This month in</div></div>
+    <div class="mg"><div class="mgl">Month Profit</div><div class="mgv">${fmt(mProfit)}</div><div class="mgs">After 27% tax</div></div>
+    <div class="mg"><div class="mgl">Week Revenue</div><div class="mgv">${fmt(wRev)}</div><div class="mgs">This week in</div></div>
+    <div class="mg"><div class="mgl">Week Profit</div><div class="mgv">${fmt(wProfit)}</div><div class="mgs">After 27% tax</div></div>
+  </div>
+  <div class="tax-box"><div class="tax-title">Total Tax Pot</div><div class="tax-amt">${fmt(taxPot)}</div><div class="tax-sub">27% of all income — never touch this</div></div>
+  <div class="sec"><div class="sec-title">Monthly Breakdown</div>
+    <div class="mrow"><div class="ml">Month revenue</div><div class="mv mv-g">${fmt(mRev)}</div></div>
+    <div class="mrow"><div class="ml">Tax to set aside this month</div><div class="mv mv-o">${fmt(mTax)}</div></div>
+    <div class="mrow"><div class="ml">Take home profit</div><div class="mv mv-g">${fmt(mProfit)}</div></div>
+    <div class="mrow"><div class="ml">Jobs completed</div><div class="mv mv-w">${done}</div></div>
+    <div class="mrow"><div class="ml">Still owed</div><div class="mv mv-o">${fmt(owed)}</div></div>
+    <div class="mrow"><div class="ml">Pipeline value</div><div class="mv mv-o">${fmt(pipeline)}</div></div>
+  </div>
+  <div class="sec"><div class="sec-title">This Week</div>
+    <div class="mrow"><div class="ml">Week revenue</div><div class="mv mv-g">${fmt(wRev)}</div></div>
+    <div class="mrow"><div class="ml">Tax to move this week</div><div class="mv mv-o">${fmt(wTax)}</div></div>
+    <div class="mrow"><div class="ml">Take home this week</div><div class="mv mv-g">${fmt(wProfit)}</div></div>
+  </div>
+  <div class="sec"><div class="sec-title">Outstanding Payments</div>
+    ${jobs.filter(j=>getOwed(j)>0).map(j=>`<div class="mrow"><div><div class="ml">${j.name}</div><div style="font-size:0.68rem;color:#8892a4">${j.type||''}</div></div><div class="mv mv-o">${fmt(getOwed(j))}</div></div>`).join('')||'<div style="color:#8892a4;font-size:0.82rem;padding:8px 0">No outstanding payments 💪</div>'}
+  </div>`;
+}
+
+// ─── INVOICE ────────────────────────────────
+// Simple approach: render once, update totals via DOM only (no re-render)
+function renderInvoice(el){
+  if(!invLines.length) invLines=[{id:'l0',desc:'Excavation & groundworks — as agreed',qty:'1',rate:''}];
+  el.innerHTML=`
+  <!-- CUSTOMER -->
+  <div class="sec"><div class="sec-title">👤 Customer</div>
+    <div class="fg"><label>Customer Name</label>
+      <input type="text" id="inv_cust" value="${invCust}" placeholder="John Smith"
+        style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%"
+        oninput="invCust=this.value">
+    </div>
+    <div class="fg"><label>Address / Location</label>
+      <input type="text" id="inv_addr" value="${invAddr}" placeholder="123 Main Street, Paisley"
+        style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%"
+        oninput="invAddr=this.value">
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Invoice #</label>
+        <input type="text" id="inv_num" value="${invNum}"
+          style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%"
+          oninput="invNum=this.value">
+      </div>
+      <div class="fg"><label>Date</label>
+        <input type="date" id="inv_date" value="${invDate}"
+          style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%;-webkit-appearance:none"
+          oninput="invDate=this.value">
+      </div>
+    </div>
+  </div>
+
+  <!-- JOB PRICE — single field, simplest possible -->
+  <div class="sec"><div class="sec-title">💷 Job Price</div>
+    <div class="fg"><label>Total Quote Price (£)</label>
+      <input type="number" inputmode="decimal" id="inv_price" value="${invPrice||''}" placeholder="0"
+        style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:18px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:900;outline:none;width:100%;text-align:center;-webkit-appearance:none"
+        oninput="invPrice=parseFloat(this.value)||0;invCalc()">
+    </div>
+    <div class="fg"><label>Job Description (optional)</label>
+      <input type="text" id="inv_desc" value="${invDesc||''}" placeholder="e.g. Driveway excavation — as agreed"
+        style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%"
+        oninput="invDesc=this.value">
+    </div>
+  </div>
+
+  <!-- PAYMENTS RECEIVED -->
+  <div class="sec"><div class="sec-title">✅ Payments Received</div>
+    <div class="fg"><label>Deposit Already Paid (£)</label>
+      <input type="number" inputmode="decimal" id="inv_dep" value="${invDep||''}" placeholder="0"
+        style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%;-webkit-appearance:none"
+        oninput="invDep=parseFloat(this.value)||0;invCalc()">
+    </div>
+    <div class="fg"><label>Materials Already Paid (£)</label>
+      <input type="number" inputmode="decimal" id="inv_mat" value="${invMat||''}" placeholder="0"
+        style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%;-webkit-appearance:none"
+        oninput="invMat=parseFloat(this.value)||0;invCalc()">
+    </div>
+  </div>
+
+  <!-- LIVE TOTALS -->
+  <div style="background:#112240;border:2px solid #3CB70A;border-radius:12px;padding:16px;margin-bottom:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:#0d1e36;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Balance To Collect</div>
+        <div id="inv_owed" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#3CB70A">£0</div>
+      </div>
+      <div style="background:#0d1e36;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Tax to Set Aside</div>
+        <div id="inv_tax" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#ffa500">£0</div>
+      </div>
+    </div>
+    <div style="background:#0d1e36;border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Your Profit After Tax (on full job)</div>
+      <div id="inv_profit" style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:900;color:#3CB70A">£0</div>
+    </div>
+  </div>
+
+  <!-- BANK DETAILS -->
+  <div class="sec"><div class="sec-title">🏦 Your Bank Details</div>
+    <div class="fg"><label>Account Name</label>
+      <input type="text" id="inv_bank" value="${invBank||'Dream Groundworks'}"
+        style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%"
+        oninput="invBank=this.value">
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Sort Code</label>
+        <input type="text" id="inv_sort" value="${invSort||''}" placeholder="00-00-00"
+          style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%"
+          oninput="invSort=this.value">
+      </div>
+      <div class="fg"><label>Account Number</label>
+        <input type="text" id="inv_acc" value="${invAcc||''}" placeholder="00000000"
+          style="background:#0d1e36;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:14px;border-radius:8px;font-family:Barlow,sans-serif;font-size:1rem;outline:none;width:100%"
+          oninput="invAcc=this.value">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-g" onclick="printInvoice()">🖨️ Generate & Print Invoice</button>
+  <button class="btn-s" onclick="clearInvoice()">Clear & Start New Invoice</button>`;
+
+  invCalc();
+}
+
+// Update totals without touching any input fields
+function invCalc(){
+  const price = invPrice||0;
+  const paid = (invDep||0)+(invMat||0);
+  const owed = Math.max(0, price-paid);
+  const tax = price*0.27;
+  const profit = price-tax;
+  const owedEl=document.getElementById('inv_owed');
+  const taxEl=document.getElementById('inv_tax');
+  const profEl=document.getElementById('inv_profit');
+  if(owedEl) owedEl.textContent='£'+Math.round(owed).toLocaleString();
+  if(taxEl) taxEl.textContent='£'+Math.round(tax).toLocaleString();
+  if(profEl) profEl.textContent='£'+Math.round(profit).toLocaleString();
+}
+
+function clearInvoice(){
+  if(!confirm('Clear this invoice?')) return;
+  invPrice=0; invDesc=''; invDep=0; invMat=0; invBal=0;
+  invCust=''; invAddr='';
+  invNum='DG-'+String(Date.now()).slice(-3);
+  renderMoney();
+}
+function printInvoice(){
+  const price=invPrice||0;
+  const owed=Math.max(0,price-(invDep||0)-(invMat||0));
+  const dateStr=invDate?new Date(invDate).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'';
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice ${invNum}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;max-width:580px;margin:32px auto;color:#000;font-size:14px;padding:20px}
+    .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #3CB70A;padding-bottom:16px;margin-bottom:20px}
+    .co{font-size:22px;font-weight:900;color:#0a1628}.co span{color:#3CB70A}
+    .co-sub{font-size:11px;color:#666;margin-top:4px;line-height:1.6}
+    .inv-right{text-align:right}
+    .inv-title{font-size:30px;font-weight:900;color:#3CB70A}
+    .inv-meta{font-size:12px;color:#666;margin-top:4px;line-height:1.6}
+    .bill-section{display:flex;justify-content:space-between;margin-bottom:20px}
+    .bill-box{flex:1}
+    .bill-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin-bottom:6px;font-weight:700}
+    .bill-value{font-size:14px;line-height:1.6}
+    .job-box{background:#f8f8f8;border-radius:8px;padding:16px;margin-bottom:20px}
+    .job-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin-bottom:4px;font-weight:700}
+    .job-price{font-size:28px;font-weight:900;color:#0a1628;margin-top:4px}
+    .payments{margin-bottom:12px}
+    .pay-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px}
+    .pay-row:last-child{border-bottom:none}
+    .balance-box{background:#0a1628;color:#fff;border-radius:8px;padding:14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+    .balance-label{font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#aaa}
+    .balance-value{font-size:26px;font-weight:900;color:#3CB70A}
+    .bank-box{background:#f5f5f5;border-radius:8px;padding:14px;margin-bottom:20px}
+    .bank-title{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin-bottom:8px;font-weight:700}
+    .bank-row{display:flex;justify-content:space-between;padding:3px 0;font-size:13px}
+    .footer{border-top:2px solid #3CB70A;padding-top:12px;font-size:11px;color:#666;display:flex;justify-content:space-between}
+  </style></head><body>
+  <div class="hd">
+    <div><div class="co">DREAM <span>GROUNDWORKS</span></div><div class="co-sub">Excavation & Groundwork Specialists<br>West of Scotland<br>+44 7472 762523 · Dreamgroundworks@icloud.com</div></div>
+    <div class="inv-right"><div class="inv-title">INVOICE</div><div class="inv-meta">#${invNum}<br>${dateStr}</div></div>
+  </div>
+  <div class="bill-section">
+    <div class="bill-box"><div class="bill-label">Billed To</div><div class="bill-value"><strong>${invCust||'Customer'}</strong><br>${invAddr||''}</div></div>
+    <div class="bill-box" style="text-align:right"><div class="bill-label">Status</div><div class="bill-value" style="color:${owed>0?'#cc0000':'#3CB70A'};font-weight:700">${owed>0?'PAYMENT DUE':'PAID IN FULL'}</div></div>
+  </div>
+  <div class="job-box">
+    <div class="job-label">Job Description</div>
+    <div style="font-size:14px;margin-bottom:8px">${invDesc||'Excavation & groundworks — as agreed'}</div>
+    <div class="job-label">Total Price</div>
+    <div class="job-price">£${price.toLocaleString()}</div>
+  </div>
+  ${(invDep>0||invMat>0)?`<div class="payments">
+    <div class="pay-row"><span>Deposit received</span><span style="color:#666">−£${(invDep||0).toLocaleString()}</span></div>
+    ${invMat>0?`<div class="pay-row"><span>Materials payment received</span><span style="color:#666">−£${invMat.toLocaleString()}</span></div>`:''}
+  </div>`:''}
+  <div class="balance-box">
+    <div><div class="balance-label">Balance Due</div></div>
+    <div class="balance-value">£${owed.toLocaleString()}</div>
+  </div>
+  ${owed>0?`<div class="bank-box">
+    <div class="bank-title">Payment Details — Bank Transfer</div>
+    <div class="bank-row"><span>Account Name</span><strong>${invBank||'Dream Groundworks'}</strong></div>
+    <div class="bank-row"><span>Sort Code</span><strong>${invSort||'—'}</strong></div>
+    <div class="bank-row"><span>Account Number</span><strong>${invAcc||'—'}</strong></div>
+    <div class="bank-row"><span>Reference</span><strong>${invCust||'Your Name'}</strong></div>
+  </div>`:''}
+  <div class="footer"><div>Thank you for choosing Dream Groundworks.<br>Payment due within 7 days. Bank transfer or cash accepted.</div><div style="text-align:right;font-weight:700;color:#3CB70A">DREAM GROUNDWORKS</div></div>
+  </body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),300);
+}
+
+// ═══════════════════════════════════════════
+// MESSAGES
+// ═══════════════════════════════════════════
+const TMPL=[
+  {cat:'enquiry',title:'New Enquiry Reply',fields:['NAME','JOB'],msg:'Hi [NAME], thank you for contacting Dream Groundworks.\n\nWe\'d love to help with your [JOB]. Before giving you a price I\'d like to come and have a proper look at the job so I can give you an accurate written quote.\n\nAre you free any evening this week or at the weekend for a quick site visit? Usually takes no more than 20 minutes.\n\nThanks, David'},
+  {cat:'enquiry',title:'Site Visit Confirmation',fields:['NAME','DATE'],msg:'Hi [NAME], just confirming I\'ll be with you on [DATE] for the site visit.\n\nI\'ll have a look at the job and get a written quote over to you the same day.\n\nThanks, David'},
+  {cat:'quote',title:'Send a Quote',fields:['NAME','JOB','AMOUNT','DEPOSIT'],msg:'Hi [NAME], great to meet you — here\'s your quote for the [JOB].\n\nPrice: £[AMOUNT] all in.\n\nPayment terms:\n— 10% deposit (£[DEPOSIT]) to secure your start date\n— Materials payment 1 week before we start\n— Remaining balance on completion\n\nJust reply to confirm and I\'ll get bank details across.\n\nThanks, David'},
+  {cat:'quote',title:'Quote Follow Up',fields:['NAME'],msg:'Hi [NAME], just following up on the quote I sent over. Completely understand if you\'re still thinking it over — just wanted to check you received it and see if you had any questions.\n\nThanks, David'},
+  {cat:'quote',title:'Day Rate — Trade',fields:['NAME','DAYS','AMOUNT'],msg:'Hi [NAME], thanks for getting in touch.\n\nDay rate for machine and operator for [DAYS] day(s) would be £[AMOUNT].\n\nHappy to chat through the job if you want to send more details.\n\nThanks, David'},
+  {cat:'booking',title:'Booking Confirmation',fields:['NAME','DATE','DEPOSIT'],msg:'Hi [NAME], brilliant — that\'s you booked in.\n\nStart date: [DATE]\nDeposit due: £[DEPOSIT] to secure the date.\n\nOnce the deposit lands you\'re locked in. I\'ll be in touch the week before to confirm timings.\n\nThanks, David'},
+  {cat:'booking',title:'Job Reminder (Day Before)',fields:['NAME'],msg:'Hi [NAME], just a reminder I\'ll be with you tomorrow to get started. I\'ll aim to be there for the time we agreed.\n\nIf anything changes just give me a shout.\n\nThanks, David'},
+  {cat:'booking',title:'Materials Payment Due',fields:['NAME','AMOUNT','DATE'],msg:'Hi [NAME], just a reminder that the materials payment of £[AMOUNT] is due by [DATE] — one week before we start.\n\nCould you get that transferred when you get a chance?\n\nThanks, David'},
+  {cat:'invoice',title:'Final Invoice',fields:['NAME','AMOUNT'],msg:'Hi [NAME], great working with you — really happy with how it came out.\n\nFinal balance due: £[AMOUNT]\n\nBank transfer to:\nAccount: Dream Groundworks\nSort code: [YOUR SORT CODE]\nAccount number: [YOUR ACCOUNT NUMBER]\n\nThanks, David'},
+  {cat:'chase',title:'Invoice Chase (7 days)',fields:['NAME','AMOUNT'],msg:'Hi [NAME], just following up on the invoice for £[AMOUNT] sent last week. Could you let me know when you\'re able to get that transferred?\n\nThanks, David'},
+  {cat:'chase',title:'Invoice Chase (Firm)',fields:['NAME','AMOUNT'],msg:'Hi [NAME], I\'ve followed up a couple of times regarding the outstanding balance of £[AMOUNT]. Could you please arrange payment as soon as possible or get in touch to discuss?\n\nThanks, David'},
+  {cat:'review',title:'Google Review Request',fields:['NAME'],msg:'Hi [NAME], really glad you\'re happy with everything — it was a pleasure.\n\nWould you mind leaving us a quick Google review? Takes 30 seconds and massively helps the business.\n\n[YOUR GOOGLE REVIEW LINK]\n\nThanks, David'},
+  {cat:'trade',title:'Approaching a Landscaper',fields:['NAME'],msg:'Hi [NAME], my name\'s David from Dream Groundworks. We\'re a specialist excavation company in the West of Scotland.\n\nI\'d love to have a chat about working together — we support landscapers with all groundwork needs.\n\nWould you be open to a quick call?\n\nThanks, David\nDream Groundworks'},
+];
+const MCATS=[{k:'enquiry',l:'Enquiry'},{k:'quote',l:'Quote'},{k:'booking',l:'Booking'},{k:'invoice',l:'Invoice'},{k:'chase',l:'Chase'},{k:'review',l:'Review'},{k:'trade',l:'Trade'}];
+
+function renderMsg(){
+  const el=document.getElementById('pg-msg');
+  const filtered=TMPL.filter(t=>t.cat===msgSubTab);
+  el.innerHTML=`<div class="stabs">${MCATS.map(c=>`<div class="stab ${msgSubTab===c.k?'active':''}" onclick="msgSubTab='${c.k}';renderMsg()">${c.l}</div>`).join('')}</div>
+  ${filtered.map((t,i)=>`<div class="sec"><div class="sec-title">${t.title}</div>
+    ${(t.fields||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">${(t.fields||[]).map(f=>`<div style="background:#0d1e36;border:1px solid rgba(255,255,255,0.1);border-radius:5px;overflow:hidden;display:flex;align-items:center"><div style="font-size:0.6rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#8892a4;padding:0 8px;white-space:nowrap">${f}</div><input type="text" placeholder="fill in" style="background:none;border:none;color:#fff;padding:7px 8px;font-family:Barlow,sans-serif;font-size:0.82rem;outline:none;width:100px" id="tf_${i}_${f}" oninput="updTmpl(${i})"></div>`).join('')}</div>`:''}
+    <div style="background:#0d1e36;border-radius:7px;padding:10px;font-size:0.8rem;line-height:1.7;color:#ccd6f6;white-space:pre-wrap;margin-bottom:9px;cursor:pointer" id="tp_${i}" onclick="copyTmpl(${i})">${t.msg}</div>
+    <div style="display:flex;gap:7px">
+      <button onclick="copyTmpl(${i})" id="tcb_${i}" style="flex:1;background:#3CB70A;color:#0a1628;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.8rem;letter-spacing:0.07em;text-transform:uppercase;border:none;padding:9px;border-radius:5px;cursor:pointer">Copy</button>
+      <button onclick="waTmpl(${i})" style="background:#25D366;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.8rem;letter-spacing:0.06em;text-transform:uppercase;border:none;padding:9px 13px;border-radius:5px;cursor:pointer">💬 WA</button>
+    </div>
+  </div>`).join('')}`;
+}
+
+function getFilledTmpl(idx){
+  const filtered=TMPL.filter(t=>t.cat===msgSubTab);
+  const t=filtered[idx]; let msg=t.msg;
+  (t.fields||[]).forEach(f=>{const el=document.getElementById(`tf_${idx}_${f}`);const v=el?el.value.trim():'';msg=msg.replace(new RegExp('\\['+f+'\\]','g'),v||`[${f}]`);});
+  return msg;
+}
+function updTmpl(idx){const el=document.getElementById(`tp_${idx}`);if(el)el.textContent=getFilledTmpl(idx);}
+function copyTmpl(idx){
+  const msg=getFilledTmpl(idx);
+  navigator.clipboard.writeText(msg).catch(()=>{const ta=document.createElement('textarea');ta.value=msg;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
+  const btn=document.getElementById(`tcb_${idx}`);if(btn){btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy',2000);}
+}
+function waTmpl(idx){window.open('https://wa.me/?text='+encodeURIComponent(getFilledTmpl(idx)));}
+
+// ═══════════════════════════════════════════
+// CONTENT
+// ═══════════════════════════════════════════
+const CDAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const CIDEAS=[
+  {type:'Before & After',platform:'Both',desc:'Film wide angle before. Same angle when finished. Simple cut.',caption:'Before ➡️ After. Another one done ✅ #dreamgroundworks #driveway #beforeandafter #westofscotland'},
+  {type:'Machine Working',platform:'TikTok',desc:'Close up of bucket digging. Get low for a ground level shot — looks massive.',caption:'There\'s something about watching a digger work 😤 #dreamgroundworks #excavation #satisfying'},
+  {type:'Timelapse',platform:'Both',desc:'Set phone on something stable. Use timelapse mode. Whole job in 60 seconds.',caption:'Full driveway excavation in 60 seconds ⏱️ #dreamgroundworks #timelapse #driveway'},
+  {type:'Talking to Camera',platform:'TikTok',desc:'Sit in cab and answer the question people always ask — how much does a driveway cost?',caption:'The question I get asked most... 👇 #tradesman #groundworks #fyp'},
+  {type:'Day in the Life',platform:'Both',desc:'Drive to job, arrive, work, coffee, finish. Show the real day.',caption:'Day in the life of Dream Groundworks 🏗️ #dayinthelife #tradesman #selfemployed'},
+  {type:'Stump Removal',platform:'Both',desc:'Film stump before. Machine pulling it out. The hole after.',caption:'Tree stump who? 😤 Gone in minutes 🏴󠁧󠁢󠁳󠁣󠁴󠁿 #dreamgroundworks #satisfying #groundworks'},
+  {type:'Transformation',platform:'Both',desc:'Overgrown garden or driveway before and after. Bigger mess at start = better reveal.',caption:'They said it couldn\'t be done 👀 Watch till the end 🏗️ #transformation #beforeandafter'},
+  {type:'Tip / Advice',platform:'TikTok',desc:'Share something useful — what to check before hiring groundworks.',caption:'Before you hire anyone for groundworks — watch this 👇 #advice #homeowner #fyp'},
+];
+const HTAGS={brand:['#dreamgroundworks','#dreamgroundworksdg'],location:['#westofscotland','#scotland','#glasgow','#paisley','#ayrshire'],services:['#excavation','#groundworks','#driveway','#driveways','#foundations','#landscaping','#minidigger','#digger','#groundlevelling'],viral:['#tradesman','#tradesmen','#construction','#satisfying','#beforeandafter','#transformation','#smallbusiness','#selfemployed','#fyp','#foryou','#viral']};
+
+function getCWkDates(off){const d=new Date(),m=new Date(d);m.setDate(d.getDate()-((d.getDay()+6)%7)+(off*7));m.setHours(0,0,0,0);return CDAYS.map((_,i)=>{const dd=new Date(m);dd.setDate(m.getDate()+i);return dd;});}
+function cDayKey(d){return d.toISOString().split('T')[0];}
+function isTdy(d){return cDayKey(d)===cDayKey(new Date());}
+
+function renderContent(){
+  const el=document.getElementById('pg-content');
+  const tabs=[{k:'plan',l:'Weekly Plan'},{k:'ideas',l:'Ideas'},{k:'hashtags',l:'Hashtags'}];
+  el.innerHTML=`<div class="stabs">${tabs.map(t=>`<div class="stab ${contentSubTab===t.k?'active':''}" onclick="contentSubTab='${t.k}';renderContent()">${t.l}</div>`).join('')}</div><div id="cContent"></div>`;
+  const cc=document.getElementById('cContent');
+  if(contentSubTab==='plan') renderContentPlan(cc);
+  else if(contentSubTab==='ideas') renderContentIdeas(cc);
+  else renderHashtags(cc);
+}
+
+function renderContentPlan(el){
+  const dates=getCWkDates(contentWeekOffset);
+  const all=dates.flatMap(d=>(contentPosts[cDayKey(d)]||[]));
+  const label=contentWeekOffset===0?'This Week':contentWeekOffset===-1?'Last Week':dates[0].toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' week';
+  el.innerHTML=`
+  <div style="display:flex;justify-content:space-between;align-items:center;background:#112240;border:1px solid rgba(60,183,10,0.2);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+    <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900;color:#3CB70A;text-transform:uppercase">${label}</div><div style="font-size:0.7rem;color:#8892a4;margin-top:1px">${all.length} planned · ${all.filter(p=>p.status==='posted').length} posted</div></div>
+    <div style="display:flex;gap:6px">
+      <button onclick="contentWeekOffset--;renderContent()" style="background:rgba(60,183,10,0.1);border:1px solid rgba(60,183,10,0.25);color:#3CB70A;padding:5px 12px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">◀</button>
+      <button onclick="if(contentWeekOffset<0){contentWeekOffset++;renderContent()}" style="background:rgba(60,183,10,0.1);border:1px solid rgba(60,183,10,0.25);color:#3CB70A;padding:5px 12px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer">▶</button>
+    </div>
+  </div>
+  ${dates.map(d=>{
+    const k=cDayKey(d), posts=contentPosts[k]||[], today=isTdy(d);
+    const pc={tiktok:'#ff0050',instagram:'#e1306c',both:'#ffa500'};
+    return `<div class="card">
+      <div class="card-hd"><div><div class="card-name" style="font-size:0.88rem">${CDAYS[dates.indexOf(d)]}</div><div class="card-meta">${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div></div>${today?'<div style="background:#3CB70A;color:#0a1628;font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:10px">TODAY</div>':''}</div>
+      ${posts.length?posts.map(p=>`<div style="background:#0d1e36;border-radius:6px;padding:8px;margin-bottom:6px;border-left:3px solid ${pc[p.platform]||'#3CB70A'};${p.status==='posted'?'opacity:0.5':''}">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><div style="font-size:0.63rem;font-weight:700;text-transform:uppercase;color:${pc[p.platform]}">${p.platform}</div><div style="font-size:0.63rem;color:${p.status==='posted'?'#3CB70A':p.status==='scheduled'?'#ffa500':'#8892a4'};font-weight:700;text-transform:uppercase">${p.status}</div></div>
+        <div style="font-size:0.8rem;font-weight:600;color:#ccd6f6">${p.type}</div>
+        ${p.caption?`<div style="font-size:0.7rem;color:#8892a4;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.caption}</div>`:''}
+        <div style="display:flex;gap:5px;margin-top:6px">
+          <button onclick="togglePosted('${k}','${p.id}')" style="padding:4px 8px;border-radius:3px;font-size:0.6rem;font-weight:700;text-transform:uppercase;background:rgba(60,183,10,0.1);color:#3CB70A;border:1px solid rgba(60,183,10,0.25);cursor:pointer">${p.status==='posted'?'Unmark':'Posted ✓'}</button>
+          <button onclick="delPost('${k}','${p.id}')" style="padding:4px 8px;border-radius:3px;font-size:0.6rem;font-weight:700;text-transform:uppercase;background:rgba(255,68,68,0.08);color:#ff4444;border:1px solid rgba(255,68,68,0.15);cursor:pointer">Del</button>
+        </div>
+      </div>`).join(''):`<div style="font-size:0.74rem;color:#8892a4;padding:4px 0">No posts planned</div>`}
+      <button class="btn-add" style="margin-top:5px" onclick="addPost('${k}')">+ Add Post</button>
+    </div>`;
+  }).join('')}`;
+}
+
+function addPost(dayK){
+  const types=['Before & After','Timelapse','Machine Working','Talking to Camera','Day in the Life','Stump Removal','Transformation','Tip / Advice'];
+  const type=prompt('Post type:\n'+types.map((t,i)=>`${i+1}. ${t}`).join('\n')+'\n\nType the name or number:');
+  if(!type) return;
+  const typeVal=types[parseInt(type)-1]||type;
+  const platform=prompt('Platform? Type: both / tiktok / instagram','both');
+  const caption=prompt('Caption? (optional)','');
+  if(!contentPosts[dayK]) contentPosts[dayK]=[];
+  contentPosts[dayK].push({id:uid(),type:typeVal,platform:platform||'both',status:'idea',caption:caption||''});
+  save('dgc',contentPosts); renderContent();
+}
+function togglePosted(k,id){const p=(contentPosts[k]||[]).find(x=>x.id===id);if(p){p.status=p.status==='posted'?'idea':'posted';save('dgc',contentPosts);renderContent();}}
+function delPost(k,id){contentPosts[k]=(contentPosts[k]||[]).filter(p=>p.id!==id);save('dgc',contentPosts);renderContent();}
+
+function renderContentIdeas(el){
+  el.innerHTML=CIDEAS.map((idea,i)=>`<div class="card">
+    <div class="card-hd"><div class="card-name" style="font-size:0.85rem">${idea.type}</div><div style="font-size:0.65rem;color:#8892a4">${idea.platform}</div></div>
+    <div style="font-size:0.8rem;color:#ccd6f6;line-height:1.5;margin-bottom:8px">${idea.desc}</div>
+    <div style="font-size:0.73rem;color:#8892a4;font-style:italic;line-height:1.4;margin-bottom:9px">"${idea.caption}"</div>
+    <button id="icb_${i}" onclick="navigator.clipboard.writeText('${idea.caption.replace(/'/g,"\\'")}').then(()=>{document.getElementById('icb_${i}').textContent='Copied ✓';setTimeout(()=>document.getElementById('icb_${i}').textContent='Copy Caption',2000)}).catch(()=>alert('Long press to copy'))" style="background:rgba(255,255,255,0.07);color:#ccd6f6;border:1px solid rgba(255,255,255,0.1);padding:7px 13px;border-radius:5px;font-family:Barlow,sans-serif;font-size:0.73rem;font-weight:600;cursor:pointer">Copy Caption</button>
+  </div>`).join('');
+}
+
+function renderHashtags(el){
+  el.innerHTML=`<div class="sec"><div class="sec-title">Tap to Select — Copy All</div>
+  ${Object.entries(HTAGS).map(([key,tags])=>`<div class="hgrp-label">${key.charAt(0).toUpperCase()+key.slice(1)}</div>
+    <div style="display:flex;flex-wrap:wrap;margin-bottom:4px">${tags.map(t=>`<div class="htag ${selHashtags.has(t)?'on':''}" onclick="selHashtags.has('${t}')?selHashtags.delete('${t}'):selHashtags.add('${t}');this.className='htag '+(selHashtags.has('${t}')?'on':'')">${t}</div>`).join('')}</div>`).join('')}
+  <button id="hashBtn" onclick="navigator.clipboard.writeText([...selHashtags].join(' ')).then(()=>{document.getElementById('hashBtn').textContent='Copied ✓';setTimeout(()=>document.getElementById('hashBtn').textContent='Copy Selected Hashtags',2000)}).catch(()=>alert('Select some hashtags first'))" style="width:100%;background:#3CB70A;color:#0a1628;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.9rem;letter-spacing:0.08em;text-transform:uppercase;border:none;padding:12px;border-radius:6px;cursor:pointer;margin-top:12px">Copy Selected Hashtags</button>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+// MODAL CLOSE
+// ═══════════════════════════════════════════
+document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+
+// ═══════════════════════════════════════════
+// SAMPLE DATA
+// ═══════════════════════════════════════════
+if(!jobs.length){
+  jobs=[
+    {id:'s1',name:'Shelby McAllister',phone:'07500000001',type:'Ground Levelling',loc:'Paisley',date:'2026-06-02',status:'quoted',quote:'9095',days:'5',dep:'0',mat:'0',bal:'0',notes:'Garden levelling 3 sections. Sleeper wall at back.',qsent:'2026-05-17',created:'2026-05-17T10:00:00Z'},
+    {id:'s2',name:'franciebhoy',phone:'',type:'Digger Hire',loc:'Glasgow',date:'',status:'quoted',quote:'',days:'1',dep:'0',mat:'0',bal:'0',notes:'Asking about day rate.',qsent:'2026-05-26',created:'2026-05-26T10:00:00Z'},
+  ];
+  save('dgj',jobs);
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+nav('home');
+</script>
+</body>
+</html>
