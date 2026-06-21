@@ -79,6 +79,7 @@ body{font-family:'Barlow',sans-serif;background:#0a1628;color:#fff;min-height:10
 .cb-w{background:#25D366;color:#fff}
 .cb-e{background:rgba(255,255,255,0.07);color:#ccd6f6;border:1px solid rgba(255,255,255,0.1)}
 .cb-d{background:rgba(255,68,68,0.08);color:#ff4444;border:1px solid rgba(255,68,68,0.15)}
+.cb-r{background:rgba(255,165,0,0.1);color:#ffa500;border:1px solid rgba(255,165,0,0.25)}
 .cb-s{background:rgba(60,183,10,0.1);color:#3CB70A;border:1px solid rgba(60,183,10,0.2)}
 /* RESULT */
 .result-box{background:#112240;border:2px solid #3CB70A;border-radius:12px;padding:16px;text-align:center;margin-bottom:12px}
@@ -280,10 +281,13 @@ let jobSubTab = 'all', moneySubTab = 'week', quoteSubTab = 'visit', msgSubTab = 
 let weekOffset = 0, contentWeekOffset = 0;
 // Quote calc state
 let qDays = 1, qHireDays = 5, qSkips = 0, qRisk = 0, qResult = null;
+let qRate = 500, qHireCost = 260, qFuelCost = 35, qSkipCost = 180;
+let qDisposal = 'skip', qGrabLoads = 1, qGrabCost = 336, qStumps = 0, qStumpCost = 120, qMat = 0, qOther = 0, qMargin = 20;
 // Visit state
 let measurements = [{id:'m0', name:'Area 1', l:'', w:'', d:'200'}];
 let visitChecks = {}, riskChecks = {}, chipSel = {};
 let vName='', vPhone='', vJobType='Driveway Excavation', vAddr='', vSizeNotes='', vAccessNotes='', vExpect='', vAgreed='', vNotes='';
+let vSlopeNotes='', vStumps='', vTrees='', vStumpNotes='';
 // Weekly
 let incEntries=[{id:'i0',desc:'',amt:''}], expEntries=[{id:'e0',desc:'',amt:''}], outEntries=[{id:'o0',desc:'',amt:''}], wkChecks={}, taxDone=false;
 // Invoice
@@ -306,6 +310,61 @@ function uid(){return Date.now().toString()+Math.random().toString(36).slice(2,5
 
 document.getElementById('hdrDate').textContent = new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
 invDate = new Date().toISOString().split('T')[0];
+
+
+// ═══════════════════════════════════════════
+// CALENDAR REMINDERS — generates .ics that adds to iPhone calendar
+// ═══════════════════════════════════════════
+function makeCalendarEvent(title, dateStr, notes, hoursFromNow){
+  let start;
+  if(dateStr){
+    start = new Date(dateStr);
+    start.setHours(8,0,0,0); // default 8am
+  } else if(hoursFromNow){
+    start = new Date(Date.now() + hoursFromNow*3600000);
+  } else {
+    start = new Date();
+  }
+  const end = new Date(start.getTime() + 3600000); // 1 hour
+  const fmt = d => d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Dream Groundworks//EN','BEGIN:VEVENT',
+    'UID:'+uid()+'@dreamgw',
+    'DTSTAMP:'+fmt(new Date()),
+    'DTSTART:'+fmt(start),
+    'DTEND:'+fmt(end),
+    'SUMMARY:'+title,
+    'DESCRIPTION:'+(notes||'').replace(/\n/g,'\\n'),
+    'BEGIN:VALARM','TRIGGER:-PT30M','ACTION:DISPLAY','DESCRIPTION:'+title,'END:VALARM',
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], {type:'text/calendar'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = title.replace(/[^a-z0-9]/gi,'_')+'.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+// Set a follow-up reminder for a job
+function setFollowUpReminder(jobId, days){
+  const j = jobs.find(x=>x.id===jobId); if(!j) return;
+  const d = new Date(); d.setDate(d.getDate()+days);
+  const dateStr = d.toISOString().split('T')[0];
+  makeCalendarEvent(
+    'Follow up: '+j.name,
+    dateStr,
+    'Follow up on quote/enquiry for '+j.name+(j.loc?' ('+j.loc+')':'')+(j.phone?' - '+j.phone:''),
+    null
+  );
+  // also log it in the job
+  j.followUpDate = dateStr;
+  save('dgj', jobs);
+  alert('Reminder created! Tap "Add" when your calendar opens to save it.');
+}
 
 // ═══════════════════════════════════════════
 // NAV
@@ -413,9 +472,31 @@ function buildJobCard(j){
       ${j.phone?`<button class="cbtn cb-w" onclick="window.open('https://wa.me/44${(j.phone||'').replace(/^0/,'').replace(/\s/g,'')}')">💬</button>`:''}
       <button class="cbtn cb-s" onclick="cycleStatus('${j.id}')">${NEXT[j.status]||'Next'}</button>
       <button class="cbtn cb-e" onclick="editJob('${j.id}')">Edit</button>
+      <button class="cbtn cb-r" onclick="openReminderMenu('${j.id}')">⏰</button>
       <button class="cbtn cb-d" onclick="delJob('${j.id}')">Del</button>
     </div>
+    ${j.followUpDate?`<div style="background:rgba(255,165,0,0.1);border-radius:5px;padding:6px 9px;font-size:0.72rem;color:#ffa500;margin-top:7px">⏰ Follow up set for ${new Date(j.followUpDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>`:''}
   </div>`;
+}
+
+// Reminder menu — pick how many days to follow up
+function openReminderMenu(jobId){
+  const j = jobs.find(x=>x.id===jobId); if(!j) return;
+  const choice = prompt('Set a follow-up reminder for "'+j.name+'"\\n\\nHow many days from now?\\n\\nType a number (e.g. 3 for follow up in 3 days)\\nor type "start" to add the job START date to your calendar.', '3');
+  if(choice===null) return;
+  if(choice.toLowerCase().trim()==='start'){
+    const dateStr = prompt('Enter job start date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    if(dateStr){
+      makeCalendarEvent('Job Start: '+j.name, dateStr, 'Job starting'+(j.loc?' at '+j.loc:'')+(j.phone?'. Customer: '+j.phone:''), null);
+      alert('Job start added! Tap "Add" when your calendar opens.');
+    }
+  } else {
+    const days = parseInt(choice);
+    if(!isNaN(days) && days>0){
+      setFollowUpReminder(jobId, days);
+      renderJobs();
+    }
+  }
 }
 
 function openAddJob(){
@@ -467,8 +548,56 @@ function cycleStatus(id){
 // ═══════════════════════════════════════════
 // QUOTE / SITE VISIT
 // ═══════════════════════════════════════════
-const VISIT_CL=[{id:'v1',l:'Take before photos',d:'Wide angle of whole site + close ups'},{id:'v2',l:'Measure all areas',d:'Length × width × depth for each section'},{id:'v3',l:'Check machine access',d:'Will the digger fit? Measure if tight'},{id:'v4',l:'Check for utilities',d:'Ask customer if services located'},{id:'v5',l:'Check ground conditions',d:'What is underneath?'},{id:'v6',l:'Check skip placement',d:'Where will skip go? Permit needed?'},{id:'v7',l:'Check overhead cables',d:'Any cables above working area?'},{id:'v8',l:'Check neighbouring property',d:'Risk to next door walls or fences?'},{id:'v9',l:'Confirm expectations',d:'What exactly do they want?'},{id:'v10',l:'Discuss payment terms',d:'Explain your 3-stage payment system'}];
-const RISK_CL=[{id:'r1',l:'Utilities not located',d:'Customer has not confirmed services found'},{id:'r2',l:'Neighbouring boundary risk',d:'Digging close to next door wall or fence'},{id:'r3',l:'Overhead cables',d:'Machine height could be an issue'},{id:'r4',l:'Rocky or unknown ground',d:'Could slow progress significantly'},{id:'r5',l:'Very tight access',d:'Extra time getting machine in and out'},{id:'r6',l:'Existing structures nearby',d:'Walls or drainage that need protecting'}];
+const VISIT_CL=[
+{id:'v1',l:'Take before photos & video',d:'Wide angle of whole site + close ups of problem areas'},
+{id:'v2',l:'Measure all areas',d:'Length × width × depth for each section'},
+{id:'v3',l:'Check machine access',d:'Will the digger fit? Measure the tightest point'},
+{id:'v4',l:'Measure access width & height',d:'Gates, paths, archways — note the narrowest gap'},
+{id:'v5',l:'Ask about underground services',d:'Water, gas, electric, drainage — customer responsibility to locate'},
+{id:'v6',l:'Check overhead cables',d:'Any cables above the working area?'},
+{id:'v7',l:'Check ground conditions',d:'What is underneath? Soil, clay, rock, rubble?'},
+{id:'v8',l:'Check the slope / levels',d:'Is the ground sloping? How much fall across the site?'},
+{id:'v9',l:'Count tree stumps & roots',d:'How many? How big? Can the digger pull them or need grinding?'},
+{id:'v10',l:'Check for trees & hedges',d:'Removing any? Protected trees (TPO)? Roots near boundary?'},
+{id:'v11',l:'Spoil — where does it go?',d:'Removed off site or stacked? Grab lorry or skip access?'},
+{id:'v12',l:'Skip / grab placement',d:'Where will it sit? On private land or road permit needed?'},
+{id:'v13',l:'Check neighbouring property',d:'Risk to next door walls, fences, drains?'},
+{id:'v14',l:'Check existing structures',d:'Walls, drainage, manholes, septic tanks to protect or work around'},
+{id:'v15',l:'Water & power on site',d:'Is there an outside tap and power the customer will let you use?'},
+{id:'v16',l:'Parking & welfare',d:'Where to park van/trailer? Toilet access for longer jobs?'},
+{id:'v17',l:'Confirm exactly what they want',d:'What does the finished job look like to them?'},
+{id:'v18',l:'Who finishes after you?',d:'Are they DIYing, or is a landscaper/builder coming after?'},
+{id:'v19',l:'Discuss timescale',d:'When do they want it done? Any deadline?'},
+{id:'v20',l:'Explain payment terms',d:'Deposit, materials, balance — the 3-stage system'}
+];
+const RISK_CL=[
+{id:'r1',l:'Utilities not located',d:'Customer has not confirmed services found'},
+{id:'r2',l:'Neighbouring boundary risk',d:'Digging close to next door wall or fence'},
+{id:'r3',l:'Overhead cables',d:'Machine height could be an issue'},
+{id:'r4',l:'Rocky or unknown ground',d:'Could slow progress significantly'},
+{id:'r5',l:'Very tight access',d:'Extra time getting machine in and out'},
+{id:'r6',l:'Existing structures nearby',d:'Walls or drainage that need protecting'},
+{id:'r7',l:'Large tree stumps / roots',d:'May need a stump grinder — extra cost to factor in'},
+{id:'r8',l:'Steep slope on site',d:'Levelling adds time and may need extra spoil removal'},
+{id:'r9',l:'Spoil removal access poor',d:'Grab lorry cannot get close — extra barrowing time'},
+{id:'r10',l:'Wet / waterlogged ground',d:'Slows digging, machine could get stuck'},
+{id:'r11',l:'Protected tree (TPO)',d:'Check with council before removing anything'},
+{id:'r12',l:'Working near a public footpath',d:'Barriers, cones and possibly a permit needed'}
+];
+
+// COMMON CUSTOMER QUESTIONS — quick reference on site
+const CUST_QS=[
+{q:'How much will it cost?',a:'I\'ll measure up and get you a written quote within a few days — no obligation.'},
+{q:'How long will it take?',a:'Once I\'ve measured up I\'ll give you a realistic timescale in the quote.'},
+{q:'Do you remove the waste?',a:'Yes — I can remove all spoil from site, or stack it if you prefer. It\'s priced in.'},
+{q:'Do I need to do anything before you start?',a:'Just make sure I have access and any underground services are located.'},
+{q:'Do you need water or power?',a:'If there\'s an outside tap and a socket that helps, but I can work around it.'},
+{q:'Will it make a mess?',a:'I keep the site as tidy as possible and leave it clean when I\'m done.'},
+{q:'Can you do the landscaping too?',a:'I do the groundwork and prep — I can recommend trusted trades for the finish.'},
+{q:'Do you take a deposit?',a:'Yes — 10% to secure your date, materials before we start, balance on completion.'},
+{q:'Are you insured?',a:'Yes, fully insured. Happy to show you the certificate.'},
+{q:'What if you hit a pipe or cable?',a:'That\'s why services must be located first — it\'s the customer\'s responsibility to confirm.'}
+];
 
 function renderQuote(){
   const el=document.getElementById('pg-quote');
@@ -513,6 +642,20 @@ function renderVisitTab(el){
       <div class="chips">${['Soft Soil','Clay','Rocky/Stony','Hardcore/Rubble','Unknown'].map(s=>`<div class="chip ${(chipSel['soil']||[]).includes(s)?'on':''}" onclick="toggleChip('${s}','soil');this.className='chip '+((chipSel['soil']||[]).includes('${s}')?'':'on')">${s}</div>`).join('')}</div>
     </div>
   </div>
+  <div class="sec"><div class="sec-title">📏 Slope & Levels</div>
+    <div class="fg"><label>Is the ground level or sloping?</label>
+      <div class="chips">${['Flat / Level','Slight Slope','Moderate Slope','Steep Slope'].map(s=>`<div class="chip ${(chipSel['slope']||[]).includes(s)?'on':''}" onclick="toggleChip('${s}','slope');this.className='chip '+((chipSel['slope']||[]).includes('${s}')?'':'on')">${s}</div>`).join('')}</div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Levelling notes (fall, height difference)</label><input type="text" id="vSlope" value="${vSlopeNotes}" placeholder="e.g. drops ~600mm front to back, needs levelling" onchange="vSlopeNotes=this.value"></div>
+  </div>
+  <div class="sec"><div class="sec-title">🌳 Trees, Stumps & Roots</div>
+    <div class="fr">
+      <div class="fg"><label>Number of stumps</label><input type="number" id="vStumps" value="${vStumps}" placeholder="0" onchange="vStumps=this.value"></div>
+      <div class="fg"><label>Trees / hedges to remove</label><input type="number" id="vTrees" value="${vTrees}" placeholder="0" onchange="vTrees=this.value"></div>
+    </div>
+    <div class="fg"><label>Stump / tree notes</label><input type="text" id="vStumpNotes" value="${vStumpNotes}" placeholder="e.g. 3 large stumps, may need grinder. 1 protected tree?" onchange="vStumpNotes=this.value"></div>
+    <div class="wbox">If stumps are too big for the digger, factor in a <strong>stump grinder</strong> (~£80-150 per stump). Check for protected trees (TPO) with the council before removing.</div>
+  </div>
   <div class="sec"><div class="sec-title">🚧 Access</div>
     <div class="chips">${['Wide — Easy','Tight but Possible','Very Tight','No Machine Access'].map(s=>`<div class="chip ${(chipSel['access']||[]).includes(s)?'on':''}" onclick="toggleChip('${s}','access');this.className='chip '+((chipSel['access']||[]).includes('${s}')?'':'on')">${s}</div>`).join('')}</div>
     <div class="fg" style="margin-top:8px"><label>Access Notes</label><input type="text" id="vAN" value="${vAccessNotes}" placeholder="e.g. Side gate 750mm — need micro digger" onchange="vAccessNotes=this.value"></div>
@@ -528,10 +671,19 @@ function renderVisitTab(el){
     <div class="fg"><label>What do they want?</label><textarea id="vE" onchange="vExpect=this.value" placeholder="e.g. Level for paving, happy with next-day spoil removal">${vExpect}</textarea></div>
     <div class="fg"><label>Anything agreed on site</label><textarea id="vAg" onchange="vAgreed=this.value" placeholder="e.g. Will protect right-side wall, access for neighbour">${vAgreed}</textarea></div>
   </div>
+  <div class="sec"><div class="sec-title">💡 Common Customer Questions</div>
+    <div style="font-size:0.73rem;color:#8892a4;margin-bottom:8px">Tap any question to see a suggested answer — handy if you get put on the spot.</div>
+    ${CUST_QS.map((item,i)=>`<div style="background:#0d1e36;border-radius:7px;margin-bottom:5px;overflow:hidden">
+      <div onclick="document.getElementById('qa_${i}').style.display=document.getElementById('qa_${i}').style.display==='block'?'none':'block'" style="padding:10px 11px;font-size:0.82rem;font-weight:600;color:#ccd6f6;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+        <span>${item.q}</span><span style="color:#3CB70A;font-size:0.9rem">+</span>
+      </div>
+      <div id="qa_${i}" style="display:none;padding:0 11px 10px;font-size:0.78rem;color:#3CB70A;line-height:1.5;font-style:italic">"${item.a}"</div>
+    </div>`).join('')}
+  </div>
   <div class="sec"><div class="sec-title">📝 General Notes</div>
     <textarea style="width:100%;background:#0d1e36;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px;border-radius:6px;font-family:Barlow,sans-serif;font-size:0.86rem;outline:none;min-height:75px;resize:vertical" id="vGN" onchange="vNotes=this.value" placeholder="Parking, dogs, gate codes, anything else...">${vNotes}</textarea>
   </div>
-  <button class="btn-g" onclick="quoteSubTab='calc';renderQuote()">Next — Calculate Quote →</button>`;
+  <button class="btn-g" onclick="prefillCalcFromVisit();quoteSubTab='calc';renderQuote()">Next — Calculate Quote →</button>`;
   renderMeasList();
 }
 
@@ -605,68 +757,151 @@ function toggleChip(val,group){
   else chipSel[group].push(val);
 }
 
-// CALCULATOR
+// CALCULATOR — auto-updating with live running total
 function renderCalcTab(el){
-  calcQuote();
   el.innerHTML=`
   <button class="back-btn" onclick="quoteSubTab='visit';renderQuote()">← Back to Site Visit</button>
-  <div class="sec"><div class="sec-title">📅 Days on Site</div>
-    <div class="stepper"><button class="step-btn" onclick="qDays=Math.max(0.5,qDays-0.5);document.getElementById('qDaysVal').textContent=qDays%1===0?qDays:qDays.toFixed(1);calcQuote()">−</button><div class="step-val" id="qDaysVal">${qDays%1===0?qDays:qDays.toFixed(1)}</div><button class="step-btn" onclick="qDays+=0.5;document.getElementById('qDaysVal').textContent=qDays%1===0?qDays:qDays.toFixed(1);calcQuote()">+</button></div>
-    <div class="ibox" style="margin-top:8px"><strong>Tip:</strong> Always add at least half a day buffer.</div>
+
+  <!-- LIVE TOTAL — always visible at top -->
+  <div style="position:sticky;top:56px;z-index:50;background:#112240;border:2px solid #3CB70A;border-radius:12px;padding:14px;margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:0.6rem;color:#8892a4;text-transform:uppercase;letter-spacing:0.08em">Quote Price (live)</div>
+        <div id="liveQuote" style="font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;font-weight:900;color:#3CB70A;line-height:1">£0</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:0.58rem;color:#8892a4;text-transform:uppercase">Your Profit</div>
+        <div id="liveProfit" style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:900;color:#3CB70A">£0</div>
+        <div style="font-size:0.58rem;color:#8892a4;text-transform:uppercase;margin-top:3px">After Tax</div>
+        <div id="liveAfterTax" style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:#8892a4">£0</div>
+      </div>
+    </div>
   </div>
+
+  <div class="sec"><div class="sec-title">📅 Days on Site</div>
+    <div class="stepper"><button class="step-btn" onclick="qDays=Math.max(0.5,qDays-0.5);calcQuote();renderCalcLight()">−</button><div class="step-val" id="qDaysVal">${qDays%1===0?qDays:qDays.toFixed(1)}</div><button class="step-btn" onclick="qDays+=0.5;calcQuote();renderCalcLight()">+</button></div>
+    <div class="ibox" style="margin-top:8px"><strong>Tip:</strong> Always add at least half a day buffer for the unexpected.</div>
+  </div>
+
+  <div class="sec"><div class="sec-title">💷 Your Day Rate</div>
+    <div class="chips">${[475,500,525,550,600].map(r=>`<div class="chip rateChip ${qRate===r?'on':''}" onclick="qRate=${r};calcQuote();renderCalcTab(document.getElementById('qContent'))">£${r}</div>`).join('')}</div>
+    <div class="fg" style="margin-top:8px"><label>Or enter custom day rate (£)</label><input type="number" id="qRateInput" value="${qRate}" oninput="qRate=parseFloat(this.value)||0;calcQuote();renderCalcLight()"></div>
+  </div>
+
   <div class="sec"><div class="sec-title">🚜 Machine Hire</div>
     <div class="fr">
-      <div class="fg"><label>Weekly hire (£)</label><input type="number" id="qHire" value="260" oninput="calcQuote()"></div>
-      <div class="fg"><label>Days used this week</label><div class="stepper"><button class="step-btn" onclick="qHireDays=Math.max(1,qHireDays-1);document.getElementById('qHDVal').textContent=qHireDays;calcQuote()">−</button><div class="step-val" id="qHDVal">${qHireDays}</div><button class="step-btn" onclick="qHireDays=Math.min(7,qHireDays+1);document.getElementById('qHDVal').textContent=qHireDays;calcQuote()">+</button></div></div>
+      <div class="fg"><label>Weekly hire (£)</label><input type="number" id="qHire" value="${qHireCost}" oninput="qHireCost=parseFloat(this.value)||0;calcQuote();renderCalcLight()"></div>
+      <div class="fg"><label>Days you'll use it</label><div class="stepper"><button class="step-btn" onclick="qHireDays=Math.max(1,qHireDays-1);calcQuote();renderCalcLight()">−</button><div class="step-val" id="qHDVal">${qHireDays}</div><button class="step-btn" onclick="qHireDays=Math.min(7,qHireDays+1);calcQuote();renderCalcLight()">+</button></div></div>
     </div>
-    <div class="fg"><label>Fuel per day (£)</label><input type="number" id="qFuel" value="35" oninput="calcQuote()"></div>
+    <div class="fg"><label>Fuel per day (£)</label><input type="number" id="qFuel" value="${qFuelCost}" oninput="qFuelCost=parseFloat(this.value)||0;calcQuote();renderCalcLight()"></div>
+    <div class="ibox" style="margin-top:6px">Hire is spread across the days you use it. 1-day job = full week's hire in the cost.</div>
   </div>
-  <div class="sec"><div class="sec-title">💷 Your Day Rate</div>
-    <div class="chips">${[450,475,500,550,600].map(r=>`<div class="chip ${r===500?'on':''}" onclick="document.getElementById('qRate').value=${r};document.querySelectorAll('#rateChips .chip').forEach(c=>c.classList.remove('on'));this.classList.add('on');calcQuote()">${'£'+r}</div>`).join('')}</div>
-    <div id="rateChips" style="display:none"></div>
-    <div class="fg" style="margin-top:8px"><label>Day rate (£)</label><input type="number" id="qRate" value="500" oninput="calcQuote()"></div>
+
+  <div class="sec"><div class="sec-title">🗑️ Spoil Removal</div>
+    <div class="chips" style="margin-bottom:10px">
+      <div class="chip ${qDisposal==='skip'?'on':''}" onclick="qDisposal='skip';calcQuote();renderCalcTab(document.getElementById('qContent'))">Skips</div>
+      <div class="chip ${qDisposal==='grab'?'on':''}" onclick="qDisposal='grab';calcQuote();renderCalcTab(document.getElementById('qContent'))">Grab Lorry</div>
+      <div class="chip ${qDisposal==='none'?'on':''}" onclick="qDisposal='none';calcQuote();renderCalcTab(document.getElementById('qContent'))">Stacked / None</div>
+    </div>
+    ${qDisposal==='skip'?`<div class="fr">
+      <div class="fg"><label>Number of skips</label><div class="stepper"><button class="step-btn" onclick="qSkips=Math.max(0,qSkips-1);calcQuote();renderCalcLight()">−</button><div class="step-val" id="qSkipsVal">${qSkips}</div><button class="step-btn" onclick="qSkips++;calcQuote();renderCalcLight()">+</button></div></div>
+      <div class="fg"><label>Cost per skip (£)</label><input type="number" id="qSkipCost" value="${qSkipCost}" oninput="qSkipCost=parseFloat(this.value)||0;calcQuote();renderCalcLight()"></div>
+    </div>${qSkips>0?`<div class="ibox">Measurements suggest ~${qSkips} skip${qSkips!==1?'s':''} for ${(window._totalVol||0).toFixed(1)}m³</div>`:''}`:''}
+    ${qDisposal==='grab'?`<div class="fr">
+      <div class="fg"><label>Number of loads</label><div class="stepper"><button class="step-btn" onclick="qGrabLoads=Math.max(1,qGrabLoads-1);calcQuote();renderCalcLight()">−</button><div class="step-val">${qGrabLoads}</div><button class="step-btn" onclick="qGrabLoads++;calcQuote();renderCalcLight()">+</button></div></div>
+      <div class="fg"><label>Cost per load (£)</label><input type="number" id="qGrabCost" value="${qGrabCost}" oninput="qGrabCost=parseFloat(this.value)||0;calcQuote();renderCalcLight()"></div>
+    </div><div class="ibox">A grab lorry takes roughly 12-15m³ per load — usually cheaper than skips for big dig-outs.</div>`:''}
+    ${qDisposal==='none'?`<div class="ibox">No disposal cost — spoil stacked on site or kept by customer.</div>`:''}
   </div>
-  <div class="sec"><div class="sec-title">🗑️ Skips & Disposal</div>
+
+  <div class="sec"><div class="sec-title">🌳 Stump Grinding</div>
     <div class="fr">
-      <div class="fg"><label>Number of skips</label><div class="stepper"><button class="step-btn" onclick="qSkips=Math.max(0,qSkips-1);document.getElementById('qSkipsVal').textContent=qSkips;calcQuote()">−</button><div class="step-val" id="qSkipsVal">${qSkips}</div><button class="step-btn" onclick="qSkips++;document.getElementById('qSkipsVal').textContent=qSkips;calcQuote()">+</button></div></div>
-      <div class="fg"><label>Cost per skip (£)</label><input type="number" id="qSkipCost" value="180" oninput="calcQuote()"></div>
+      <div class="fg"><label>Number of stumps</label><div class="stepper"><button class="step-btn" onclick="qStumps=Math.max(0,qStumps-1);calcQuote();renderCalcLight()">−</button><div class="step-val">${qStumps}</div><button class="step-btn" onclick="qStumps++;calcQuote();renderCalcLight()">+</button></div></div>
+      <div class="fg"><label>Cost per stump (£)</label><input type="number" id="qStumpCost" value="${qStumpCost}" oninput="qStumpCost=parseFloat(this.value)||0;calcQuote();renderCalcLight()"></div>
     </div>
-    ${qSkips>0?`<div class="ibox"><strong>Based on measurements:</strong> ${qSkips} skip${qSkips!==1?'s':''} suggested</div>`:''}
+    ${qStumps>0?`<div class="ibox">${qStumps} stump${qStumps!==1?'s':''} × £${qStumpCost} = £${qStumps*qStumpCost}. Add your markup if you're subbing it out.</div>`:'<div class="ibox">Only if stumps are too big for the digger to pull. ~£80-150 per stump.</div>'}
   </div>
-  <div class="sec"><div class="sec-title">🧱 Extra Costs</div>
+
+  <div class="sec"><div class="sec-title">🧱 Materials & Extras</div>
     <div class="fr">
-      <div class="fg"><label>Materials (£)</label><input type="number" id="qMat" value="0" oninput="calcQuote()"></div>
-      <div class="fg"><label>Other (£)</label><input type="number" id="qOther" value="0" oninput="calcQuote()"></div>
-    </div>
-    <div class="fg"><label>Risk premium</label>
-      <div class="chips">${[{l:'Standard',v:0},{l:'+10%',v:10},{l:'+15%',v:15},{l:'+25%',v:25}].map(r=>`<div class="chip ${qRisk===r.v?'on':''}" onclick="qRisk=${r.v};document.querySelectorAll('.rchip').forEach(c=>c.classList.remove('on'));this.classList.add('on');calcQuote()" class="chip rchip ${qRisk===r.v?'on':''}">${r.l}</div>`).join('')}</div>
+      <div class="fg"><label>Materials e.g. Type 1 (£)</label><input type="number" id="qMat" value="${qMat}" oninput="qMat=parseFloat(this.value)||0;calcQuote();renderCalcLight()"></div>
+      <div class="fg"><label>Other costs (£)</label><input type="number" id="qOther" value="${qOther}" oninput="qOther=parseFloat(this.value)||0;calcQuote();renderCalcLight()"></div>
     </div>
   </div>
+
+  <div class="sec"><div class="sec-title">⚠️ Risk Premium</div>
+    <div class="chips">${[{l:'Standard',v:0},{l:'+10%',v:10},{l:'+15%',v:15},{l:'+25%',v:25}].map(r=>`<div class="chip ${qRisk===r.v?'on':''}" onclick="qRisk=${r.v};calcQuote();renderCalcTab(document.getElementById('qContent'))">${r.l}</div>`).join('')}</div>
+    <div class="ibox" style="margin-top:8px">Add a premium for tricky access, rocky ground, tight timescales or anything that could slow you down.</div>
+  </div>
+
   <div class="sec"><div class="sec-title">📈 Profit Margin</div>
-    <div class="slider-row"><input type="range" class="slider" id="qMargin" min="0" max="40" value="20" oninput="document.getElementById('qMarginVal').textContent=this.value+'%';calcQuote()"><div class="sval" id="qMarginVal">20%</div></div>
-    <div class="ibox" style="margin-top:8px"><strong>15–20%</strong> standard. <strong>20–30%</strong> for risky jobs.</div>
+    <div class="slider-row"><input type="range" class="slider" id="qMargin" min="0" max="40" value="${qMargin}" oninput="qMargin=parseFloat(this.value);document.getElementById('qMarginVal').textContent=this.value+'%';calcQuote();renderCalcLight()"><div class="sval" id="qMarginVal">${qMargin}%</div></div>
+    <div class="ibox" style="margin-top:8px"><strong>15–20%</strong> standard. <strong>20–30%</strong> for risky or premium jobs.</div>
   </div>
-  <button class="btn-g" onclick="calcQuote();quoteSubTab='result';renderQuote()">Calculate Quote →</button>`;
+
+  <!-- COST BREAKDOWN -->
+  <div class="sec"><div class="sec-title">🧾 Cost Breakdown</div>
+    <div id="costBreakdown"></div>
+  </div>
+
+  <button class="btn-g" onclick="quoteSubTab='result';renderQuote()">See Full Quote →</button>`;
+  calcQuote();
+  renderCalcLight();
+  renderCostBreakdown();
+}
+
+// Update just the live numbers without rebuilding everything
+function renderCalcLight(){
+  if(!qResult) return;
+  const lq=document.getElementById('liveQuote'); if(lq) lq.textContent='£'+qResult.quote.toLocaleString();
+  const lp=document.getElementById('liveProfit'); if(lp) lp.textContent='£'+Math.round(qResult.profit).toLocaleString();
+  const lat=document.getElementById('liveAfterTax'); if(lat) lat.textContent='£'+Math.round(qResult.afterTax).toLocaleString();
+  const dv=document.getElementById('qDaysVal'); if(dv) dv.textContent=qDays%1===0?qDays:qDays.toFixed(1);
+  renderCostBreakdown();
+}
+
+function renderCostBreakdown(){
+  const el=document.getElementById('costBreakdown'); if(!el||!qResult) return;
+  const r=qResult;
+  el.innerHTML=`
+    <div class="mrow"><div class="ml">Your wage (${r.days} day${r.days!==1?'s':''})</div><div class="mv mv-w">£${Math.round(r.wage).toLocaleString()}</div></div>
+    <div class="mrow"><div class="ml">Machine hire</div><div class="mv mv-w">£${Math.round(r.hireCost).toLocaleString()}</div></div>
+    <div class="mrow"><div class="ml">Fuel</div><div class="mv mv-w">£${Math.round(r.fuelCost).toLocaleString()}</div></div>
+    <div class="mrow"><div class="ml">Spoil removal</div><div class="mv mv-w">£${Math.round(r.disposalCost).toLocaleString()}</div></div>
+    ${r.stumpCost>0?`<div class="mrow"><div class="ml">Stump grinding</div><div class="mv mv-w">£${Math.round(r.stumpCost).toLocaleString()}</div></div>`:''}
+    ${r.materials>0?`<div class="mrow"><div class="ml">Materials</div><div class="mv mv-w">£${Math.round(r.materials).toLocaleString()}</div></div>`:''}
+    ${r.otherCost>0?`<div class="mrow"><div class="ml">Other</div><div class="mv mv-w">£${Math.round(r.otherCost).toLocaleString()}</div></div>`:''}
+    ${r.riskAmount>0?`<div class="mrow"><div class="ml">Risk premium (${qRisk}%)</div><div class="mv mv-o">£${Math.round(r.riskAmount).toLocaleString()}</div></div>`:''}
+    <div class="mrow"><div class="ml">Margin (${r.margin}%)</div><div class="mv mv-g">£${Math.round(r.marginAmount).toLocaleString()}</div></div>
+    <div class="mrow" style="border-top:1px solid rgba(60,183,10,0.3);margin-top:4px;padding-top:8px"><div class="ml" style="font-weight:700">Total Quote</div><div class="mv mv-g" style="font-size:1.2rem">£${r.quote.toLocaleString()}</div></div>`;
 }
 
 function calcQuote(){
-  const hire=parseFloat(document.getElementById('qHire')?.value)||260;
-  const fuel=parseFloat(document.getElementById('qFuel')?.value)||35;
-  const rate=parseFloat(document.getElementById('qRate')?.value)||500;
-  const sc=parseFloat(document.getElementById('qSkipCost')?.value)||180;
-  const mat=parseFloat(document.getElementById('qMat')?.value)||0;
-  const other=parseFloat(document.getElementById('qOther')?.value)||0;
-  const margin=parseFloat(document.getElementById('qMargin')?.value)||20;
-  const hpd=(hire/qHireDays);
-  const costs=(hpd*qDays)+(fuel*qDays)+(qSkips*sc)+mat+other;
-  const wage=rate*qDays;
-  const sub=costs+wage;
-  const risk=sub*(qRisk/100);
-  const marg=(sub+risk)*(margin/100);
-  const raw=sub+risk+marg;
+  const hireCost=(qHireCost/qHireDays)*qDays;
+  const fuelCost=qFuelCost*qDays;
+  let disposalCost=0;
+  if(qDisposal==='skip') disposalCost=qSkips*qSkipCost;
+  else if(qDisposal==='grab') disposalCost=qGrabLoads*qGrabCost;
+  const stumpCost=qStumps*qStumpCost;
+  const wage=qRate*qDays;
+  const totalCosts=hireCost+fuelCost+disposalCost+stumpCost+qMat+qOther;
+  const sub=totalCosts+wage;
+  const riskAmount=sub*(qRisk/100);
+  const marginAmount=(sub+riskAmount)*(qMargin/100);
+  const raw=sub+riskAmount+marginAmount;
   const rounded=Math.ceil(raw/50)*50;
-  const profit=rounded-costs-wage;
-  qResult={quote:rounded,costs,wage,profit,afterTax:profit*0.73,margin,days:qDays,materials:mat,deposit:Math.round(rounded*0.1),balance:rounded-Math.round(rounded*0.1)-mat};
+  const profit=rounded-totalCosts-wage;
+  qResult={
+    quote:rounded, costs:totalCosts, wage, profit, afterTax:profit*0.73,
+    margin:qMargin, days:qDays, materials:qMat, otherCost:qOther,
+    hireCost, fuelCost, disposalCost, stumpCost, riskAmount, marginAmount,
+    deposit:Math.round(rounded*0.1), balance:rounded-Math.round(rounded*0.1)-qMat
+  };
+}
+
+function prefillCalcFromVisit(){
+  // carry stump count from site visit into calculator
+  if(vStumps && parseInt(vStumps)>0) qStumps=parseInt(vStumps);
 }
 
 function renderResultTab(el){
@@ -721,6 +956,11 @@ Thanks, David`;
     <div class="sec-title">💬 Quote Message — Tap to Copy</div>
     <div id="qMsg" style="background:#0d1e36;border-radius:7px;padding:11px;font-size:0.82rem;line-height:1.7;color:#ccd6f6;white-space:pre-wrap;margin-bottom:10px;cursor:pointer" onclick="copyQMsg()">${msg}</div>
     <button id="qMsgBtn" onclick="copyQMsg()" style="width:100%;background:#3CB70A;color:#0a1628;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.9rem;letter-spacing:0.08em;text-transform:uppercase;border:none;padding:12px;border-radius:6px;cursor:pointer">Copy Message</button>
+  </div>
+  <div class="sec">
+    <div class="sec-title">⏰ Don't Forget To Follow Up</div>
+    <div style="font-size:0.75rem;color:#8892a4;margin-bottom:10px">Add a nudge to your phone calendar so you chase this quote if you don't hear back.</div>
+    <button onclick="makeCalendarEvent('Follow up: ${(vName||'customer').replace(/'/g,'')}', new Date(Date.now()+3*86400000).toISOString().split('T')[0], 'Follow up on the quote you sent${vName?' to '+vName.replace(/'/g,''):''}${vAddr?' - '+vAddr.replace(/'/g,''):''}', null);alert('Reminder created! Tap Add when your calendar opens.')" style="width:100%;background:rgba(255,165,0,0.12);border:1px solid rgba(255,165,0,0.4);color:#ffa500;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.85rem;letter-spacing:0.06em;text-transform:uppercase;padding:11px;border-radius:6px;cursor:pointer">📅 Remind Me In 3 Days</button>
   </div>`;
 }
 
@@ -1040,7 +1280,7 @@ function printInvoice(){
     .footer{border-top:2px solid #3CB70A;padding-top:12px;font-size:11px;color:#666;display:flex;justify-content:space-between}
   </style></head><body>
   <div class="hd">
-    <div><div class="co">DREAM <span>GROUNDWORKS</span></div><div class="co-sub">Excavation & Groundwork Specialists<br>West of Scotland<br>+44 7472 762523 · Dreamgroundworks@icloud.com</div></div>
+    <div><img src="data:image/png;base64,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ZeKVNQNOzkJLODHnIOYPWAc3QvuazMB6l0BYFutR29YyMDkvfK+dkUgjWeQ47vzzJsPytly6YBH4WiGCJUHaAuJEbKle6WySHet0+9p0ZoMGX9TFUnOWJieuqB230BIT073xVws5jwdBIEgqKTI9lOZcMb1PI0Au1vtnX4AFrKLsjVEB2JLOcUqpeDx+2223RSHNF1544dJLLzVSatt2+NH+/fv//d///Te/+U1jY6PZksPJj0Z3jFouWQ1SynDFGFu64kyby0WXBTOXn2r4s9au75cfUPJFIYTZmMovGovFygGVUBhKvmLbdrkiNZNQcmQ4zvBxRGfJfBqVrhJsOfp1A/v5vl9xg7Asq+QjpVT0HbOrVpHPioIaHW0YyTNX1FpXeYLGtK7AhaiwzyEia81AKF772cBAp8jFpT8o/T3+4E7t9ucAFABKIRiD6pijYPqAhFTo8QGApPA9P5lKtH5I9ts9SWFLEghSu+ilVf9u2bM5N7DeS7/iaIcBsLl53HErx487kxLzsvlJAy70HyzkfRdkAQQhB3VpSyP7URLHsNoiGj3NteMT++6TmS15KVFriBKiSvrWVI9ASCkLhcL73//+BQsWhEp17969l1xySUdHRyKR8DwvDMyY46WUnud1dHQYWQ0vN3v27Pr6eqWUEGL37t29vb0zZ8688MILp0yZ4rruqlWrXn75ZaMWzDOeP3/+ihUr5s+f39LSwsx9fX1r165dvXr1hg0bzPMOxVUIMX/+fANiWZbV09Oze/fu0HgDgHgicfxxxzEza7Zse9/+fQcPHgSAeDx+3HHHhYdt2bIln89Pnz79bW9727HHHhuPx7u7u3fs2PHkk08ODAyY1VwShjFY98qVK0866aT6+vpsNrtp06Znnnmmv79fDM+08n0/lUrNmzfPN92MLKtt397u7u5Q0xpDY+HCheaLvu9v2bJFax3FnxsaGlpbW33ftyyrt7d39+7doR52HKexsXHlypULFiyYNWtWKpXq7+/funXrunXrnn32WQNHR7fO+vr68FSDg4Pbtm0DgHe/+91z584VQvT39//0pz+tiPcW6aLoed6ihSdaluVrJYTwff+1114LdbJlWWedddapp546f/78RCKRTqc3bdq0du3adevW9fX1RQV7yCURVV4kpSAiApAAFoJEsAiEJaQtpbSGDpTFV8kJzDvhp9KS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" style="height:54px;width:auto;display:block;margin-bottom:8px" alt="Dream Groundworks"><div class="co-sub">Excavation & Groundwork Specialists<br>West of Scotland<br>+44 7472 762523 · Dreamgroundworks@icloud.com</div></div>
     <div class="inv-right"><div class="inv-title">INVOICE</div><div class="inv-meta">#${invNum}<br>${dateStr}</div></div>
   </div>
   <div class="bill-section">
